@@ -1,0 +1,27 @@
+<!--
+  Decodeur pour le mode de secours de l'application metier.
+
+  A LIRE AVANT LA SOUTENANCE, c'est une question quasi certaine :
+  le journal nominal de l'application est en JSON, et Wazuh decode le JSON
+  nativement des que l'agent declare <log_format>json</log_format>. Il n'y a
+  donc AUCUN decodeur a ecrire pour le chemin nominal : chaque cle du JSON
+  devient un champ interrogeable tel quel.
+
+  Ce decodeur existe pour l'autre chemin. Quand l'application bascule en mode
+  degrade (disque plein, bibliotheque JSON indisponible), elle ecrit une ligne
+  texte a plat dans access.log. C'est ce format la qui demande un decodeur, et
+  c'est celui qu'on montre dans le rapport.
+
+  Format cible :
+  2026-12-03T14:22:01Z dossiers user=m.bennani src=172.30.0.50 action=consult dossier=DOS-004912 status=403
+-->
+
+<decoder name="dossiers">
+  <prematch>^\S+ dossiers user=</prematch>
+</decoder>
+
+<decoder name="dossiers-champs">
+  <parent>dossiers</parent>
+  <regex offset="after_prematch">^(\S+) src=(\S+) action=(\w+) dossier=(\S+) status=(\d+)</regex>
+  <order>user, srcip, action, dossier_id, status</order>
+</decoder>

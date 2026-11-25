@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dossier de projet · Surveillance et détection d’incidents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#faf8f5;--paper-2:#fffdfa;--ink:#16181d;--ink-2:#4a4f5a;--ink-3:#848a96;--rule:#e3ded5;--rule-2:#d2ccc0;
+--edge:#0ea5e9;--fog:#0c4a6e;--cloud:#7c3aed;--sec:#059669;--mes:#7c3aed;--warn:#b91c1c;--ok:#15803d}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px 100px}
+nav{position:sticky;top:0;z-index:50;background:rgba(250,248,245,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);margin:0 -20px;padding:8px 20px}
+.navin{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:7px}
+.navscroll{flex:1;position:relative;min-width:0}
+.navscroll:after{content:'';position:absolute;top:0;right:0;width:22px;height:100%;pointer-events:none;background:linear-gradient(to right,rgba(250,248,245,0),rgba(250,248,245,.95))}
+.navlinks{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth}
+.navlinks::-webkit-scrollbar{display:none}
+.navlinks a{flex:none;font-size:12px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:5px 10px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{background:#efe9e0;color:var(--ink)}
+.navlinks a.on{background:var(--ink);color:var(--paper)}
+.navarrow{flex:none;width:28px;height:28px;border-radius:7px;border:1px solid var(--rule-2);background:var(--paper-2);color:var(--ink-2);font:inherit;font-size:18px;line-height:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.navarrow:hover:not(:disabled){background:#efe9e0;color:var(--ink);border-color:var(--ink-3)}
+.navarrow:disabled{opacity:.28;cursor:default}
+header{padding:48px 0 32px;border-bottom:2px solid var(--ink)}
+.kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:clamp(32px,7vw,52px);line-height:1.03;margin:12px 0 14px}
+.sub{font-size:16px;color:var(--ink-2);max-width:62ch;margin:0}
+.meta{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--rule-2);border-radius:999px;color:var(--ink-2);background:var(--paper-2)}
+.pill.g{border-color:#86cf96;background:#eaf7ed;color:#14532d}
+section{padding:42px 0;border-bottom:1px solid var(--rule)}
+h2{font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:clamp(25px,5vw,35px);line-height:1.1;margin:0 0 6px}
+.secno{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink-3);letter-spacing:.1em;display:block;margin-bottom:8px}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px}
+h4{font-size:13px;font-weight:700;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2)}
+p{margin:0 0 14px}ul,ol{margin:0 0 14px;padding-left:20px}li{margin-bottom:6px}
+strong{font-weight:650}.fr{font-style:italic;color:var(--ink-2)}
+code{font-family:'JetBrains Mono',monospace;font-size:.86em;background:#f0ebe3;padding:1px 5px;border-radius:4px}
+pre{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.55;background:#1e2127;color:#e6e1d8;padding:14px 16px;border-radius:9px;overflow-x:auto;margin:14px 0}
+pre .c{color:#8b93a1}
+.box{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:18px 0}
+.box.key{border-left:3px solid var(--ok);background:#f4faf5}
+.box.warn{border-left:3px solid var(--warn);background:#fdf6f5}
+.box.note{border-left:3px solid var(--fog);background:#f4f4fd}
+.box h4{margin-top:0}.box p:last-child,.box ul:last-child{margin-bottom:0}
+.tw{overflow-x:auto;margin:18px -20px;padding:0 20px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:540px}
+th{text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);border-bottom:1.5px solid var(--ink);padding:8px 10px 7px;vertical-align:bottom}
+td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}td:first-child{font-weight:600}
+figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:12px;color:var(--ink-3);margin-top:8px;text-align:center}
+.svgscroll{overflow-x:auto;margin:0 -20px;padding:0 20px}
+.svgscroll svg{min-width:460px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+@media(max-width:620px){.two{grid-template-columns:1fr}}
+.card{background:var(--paper-2);border:1px solid var(--rule);border-radius:10px;padding:15px 16px}
+.card h5{margin:0 0 8px;font-size:14px;font-weight:700}
+.card ul{margin:0;padding-left:17px;font-size:13.5px}.card li{margin-bottom:5px}
+.step{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.step:last-child{border-bottom:none}
+.stepn{flex:none;width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
+.stept{font-weight:650;font-size:14.5px;margin-bottom:3px}
+.stepd{font-size:13.5px;color:var(--ink-2)}
+.time{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--edge);margin-bottom:2px}
+footer{padding:30px 0;font-size:12.5px;color:var(--ink-3);text-align:center}
+.navlinks a.on{background:#0c4a6e;color:#fff}
+</style>
+</head>
+<body>
+<nav><div class="navin">
+<button class="navarrow" id="navPrev" onclick="navStep(-1)" title="Section précédente">&lsaquo;</button>
+<div class="navscroll"><div class="navlinks" id="navLinks">
+<a href="#sujet">1 · Le sujet</a>
+<a href="#probleme">2 · Problématique</a>
+<a href="#besoins">3 · Besoins</a>
+<a href="#parc">4 · Le parc surveillé</a>
+<a href="#archi-ctx">5 · Contexte</a>
+<a href="#archi-cont">6 · Conteneurs</a>
+<a href="#archi-deploy">7 · Déploiement</a>
+<a href="#chaine">8 · Chaîne de détection</a>
+<a href="#stack">9 · Technologies</a>
+<a href="#secu">10 · Sécurité</a>
+<a href="#mesures">11 · Mesures</a>
+<a href="#plan">12 · Organisation</a>
+<a href="#risques">13 · Risques</a>
+</div></div>
+<button class="navarrow" id="navNext" onclick="navStep(1)" title="Section suivante">&rsaquo;</button>
+</div></nav>
+
+<div class="wrap">
+<header>
+<span class="kicker">Sujet 13 · axe 4 · sécurité et gouvernance du Cloud</span>
+<h1>Surveillance et détection des incidents de sécurité</h1>
+<p class="sub">Collecter les journaux d'un parc Linux, qualifier les événements suspects, générer des alertes, et mesurer ce que la chaîne détecte vraiment plutôt que ce qu'elle est censée détecter.</p>
+<div class="meta">
+<span class="pill">Sujet 13 de la liste du Pr. Hamal</span>
+<span class="pill">2 personnes · 2 semaines</span>
+<span class="pill">Linux · Wazuh · Grafana · Docker</span>
+<span class="pill g">Aucun coût, tout en local</span>
+</div>
+</header>
+
+<section id="sujet">
+<span class="secno">SECTION 1</span>
+<h2>Le sujet, mot pour mot</h2>
+<div class="box note">
+<h4>Énoncé du Pr. Hamal</h4>
+<p><strong>Sujet 13 · Surveillance et détection des incidents de sécurité Cloud.</strong> Mettre en place un système de surveillance des journaux, de détection des événements suspects et de génération d'alertes.</p>
+<p style="margin-bottom:0"><strong>Technologies :</strong> Linux, Wazuh, Grafana, Docker.</p>
+</div>
+
+<p>Trois verbes, donc trois choses à démontrer : <strong>surveiller</strong> des journaux, <strong>détecter</strong> des événements suspects, <strong>générer</strong> des alertes. Chacun se prouve différemment, et c'est la détection qui est la plus difficile à prouver honnêtement.</p>
+
+<p>Voici le piège de ce sujet, et il est sérieux. Wazuh arrive avec plusieurs milliers de règles écrites par ses auteurs. Une installation réussie détecte donc immédiatement une force brute SSH, une modification de fichier sensible, une tentative d'injection SQL. Un groupe peut monter la pile, lancer quatre attaques, montrer quatre alertes rouges, et n'avoir strictement rien produit : il a fait la démonstration du travail de quelqu'un d'autre.</p>
+
+<p>Le jury ne verra pas forcément la différence sur le moment. Mais le critère noté s'appelle <strong>réalisation technique, 30 %</strong>, et une installation n'est pas une réalisation.</p>
+
+<div class="box key">
+<h4>La décision qui structure tout ce dossier</h4>
+<p>Le projet déclare un <strong>faux négatif</strong> et le traite. Le cinquième scénario d'attaque frappe l'application maison du parc, dont le journal a un format que Wazuh ne connaît pas. Le jeu de règles livré ne voit rien. Nous écrivons alors le décodeur et les deux règles qui le détectent, dont une règle de corrélation temporelle.</p>
+<p style="margin-bottom:0">Cette seule ligne de la matrice de détection vaut plus que les quatre autres réunies, parce qu'elle est la seule que personne d'autre n'a écrite.</p>
+</div>
+
+<p>La phrase à tenir en soutenance : nous n'avons pas installé un outil de détection, nous avons mesuré ce qu'il détecte, trouvé ce qu'il manque, et comblé le trou.</p>
+</section>
+
+<section id="probleme">
+<span class="secno">SECTION 2</span>
+<h2>Problématique et objectifs</h2>
+<h3>Le point de départ</h3>
+<p>Un parc de serveurs Linux produit des journaux en permanence, et ces journaux posent quatre problèmes qui n'ont rien à voir entre eux.</p>
+
+<p>Ils sont <strong>dispersés</strong> : chaque machine garde les siens, et une intrusion qui touche trois machines se lit à trois endroits. Ils sont <strong>volumineux</strong> : personne ne lit <code>/var/log/auth.log</code> ligne par ligne, donc un événement important est noyé. Ils sont <strong>locaux</strong> : un attaquant qui obtient les droits d'administration efface les traces de son passage, et les journaux disparaissent avec la preuve. Et ils sont <strong>muets</strong> : un journal ne réveille personne, il attend d'être lu.</p>
+
+<p>Une chaîne de surveillance répond aux quatre, mais par quatre mécanismes distincts qu'il faut savoir nommer séparément : la centralisation, la qualification par règles, l'expédition immédiate hors de la machine surveillée, et la notification.</p>
+
+<div class="box note">
+<h4>Le troisième point mérite d'être souligné en soutenance</h4>
+<p style="margin-bottom:0">L'agent envoie chaque événement au gestionnaire <strong>au moment où il se produit</strong>. Quand l'attaquant vide <code>/var/log</code>, l'événement est déjà parti. C'est le seul mécanisme de la chaîne qui protège la preuve elle-même, et c'est une bonne réponse à la question : à quoi sert un agent, plutôt que de lire les fichiers à distance une fois par heure.</p>
+</div>
+
+<h3>Les objectifs, formulés comme vérifiables</h3>
+<div class="two">
+<div class="card">
+<h5>Surveiller</h5>
+<ul>
+<li>Trois hôtes Linux, chacun avec son agent, visibles et actifs dans la console</li>
+<li>Journaux système, journaux de service et contrôle d'intégrité des fichiers</li>
+<li>Canal chiffré entre agent et gestionnaire, et on le montre au lieu de l'affirmer</li>
+</ul>
+</div>
+<div class="card">
+<h5>Détecter</h5>
+<ul>
+<li>Cinq scénarios d'attaque scriptés, horodatés au déclenchement</li>
+<li>Quatre couverts par le jeu de règles livré, un volontairement non couvert</li>
+<li>Un décodeur et deux règles écrits par l'équipe, dont une corrélation sur fenêtre de temps</li>
+</ul>
+</div>
+<div class="card">
+<h5>Alerter</h5>
+<ul>
+<li>Tableaux de bord Grafana alimentés par l'indexeur, pas par des captures d'écran</li>
+<li>Une règle d'alerte évaluée périodiquement, avec un destinataire qui journalise</li>
+<li>Latence mesurée en deux parts : détection, puis notification</li>
+</ul>
+</div>
+<div class="card">
+<h5>Ce que le projet ne prétend pas faire</h5>
+<ul>
+<li>Pas de réponse active automatique : bloquer une adresse introduit un risque de déni de service par faux positif, et nous l'expliquons plutôt que de le subir</li>
+<li>Pas de notification par courriel : sans serveur SMTP, ce serait une démonstration qui ne part jamais</li>
+<li>Pas de mesure de tenue en charge au delà d'un ordre de grandeur</li>
+</ul>
+</div>
+</div>
+
+<div class="box warn">
+<h4>La question piège probable, et sa réponse</h4>
+<p style="margin-bottom:0">Pourquoi ne pas activer la réponse active, puisque Wazuh la propose en une ligne ? Parce qu'une règle de blocage déclenchée par un faux positif coupe l'accès d'un administrateur légitime, et qu'une règle écrite dans la semaine et testée sur cinq scénarios n'a pas le droit de décider seule. Nous montrons le mécanisme dans le dossier, nous ne l'armons pas. Savoir pourquoi on n'arme pas une automatisation est une réponse plus mûre que de l'avoir armée.</p>
+</div>
+</section>
+<section id="besoins">
+<span class="secno">SECTION 3</span>
+<h2>Besoins fonctionnels et non fonctionnels</h2>
+<p>Le livrable 1 du cahier des charges demande les deux. Pour une chaîne de détection, les besoins fonctionnels décrivent ce que l'analyste peut faire, et les besoins non fonctionnels décrivent ce qui rend la chaîne crédible.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Type</th><th>Besoin</th><th>Comment il est vérifié</th></tr></thead>
+<tbody>
+<tr><td>Fonctionnel</td><td>Voir les alertes des trois hôtes au même endroit, filtrables par hôte et par niveau</td><td>Tableau de bord Grafana, filtres exercés devant le jury</td></tr>
+<tr><td>Fonctionnel</td><td>Retrouver une alerte à partir d'une heure, d'une adresse source ou d'un nom de règle</td><td>Recherche dans la console, sur une alerte produite pendant la séance</td></tr>
+<tr><td>Fonctionnel</td><td>Recevoir une notification sans consulter le tableau de bord</td><td>Journal du récepteur, horodaté, comparé à l'heure de l'attaque</td></tr>
+<tr><td>Fonctionnel</td><td>Savoir quel fichier a été modifié, et en quoi</td><td>Alerte de contrôle d'intégrité, avec les sommes de contrôle avant et après</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>Un événement produit sur un hôte quitte cet hôte immédiatement</td><td>Effacement du journal local après l'attaque : l'alerte est toujours là</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>Le trafic agent vers gestionnaire est chiffré</td><td>Capture réseau sur <code>net-parc</code> : la charge utile est illisible</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>La latence de détection est connue et bornée</td><td>Matrice de détection, colonne latence, cinq relevés</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>Un format de journal inconnu peut être pris en charge sans modifier l'application</td><td>Décodeur écrit par l'équipe, scénario 5</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>Aucun composant de stockage n'est joignable depuis le parc surveillé</td><td>Depuis un hôte du parc, la connexion à l'indexeur échoue</td></tr>
+<tr><td><strong>Non fonctionnel</strong></td><td>Reconstruction complète depuis le dépôt</td><td><code>docker compose up</code> sur une machine vierge, puis enrôlement des agents</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+<h4>Les deux besoins non fonctionnels qui font la différence</h4>
+<p>Le premier : <strong>l'événement quitte l'hôte immédiatement</strong>. La démonstration est spectaculaire et prend dix secondes. On lance la force brute SSH, on vide <code>/var/log/auth.log</code> sur l'hôte, et l'alerte est toujours affichée dans Grafana. Cela montre d'un coup pourquoi la centralisation n'est pas une commodité mais une mesure de sécurité.</p>
+<p style="margin-bottom:0">Le second : <strong>le parc ne joint pas l'indexeur</strong>. Un hôte compromis ne doit pas pouvoir atteindre la base des alertes pour les altérer. C'est une propriété d'architecture, elle se lit sur le diagramme de déploiement, et elle se vérifie par un refus de connexion.</p>
+</div>
+</section>
+
+<section id="parc">
+<span class="secno">SECTION 4</span>
+<h2>Le parc surveillé</h2>
+<p>Le parc n'est pas noté. Il doit exister, ressembler à quelque chose de plausible, et surtout <strong>produire les bons événements</strong>. Trois hôtes suffisent, chacun choisi pour la famille d'événements qu'il apporte.</p>
+
+<div class="two">
+<div class="card">
+<h5>web-01 · le serveur exposé</h5>
+<ul>
+<li>nginx avec son journal d'accès, et un démon SSH</li>
+<li>Apporte : les tentatives d'authentification SSH, et les attaques web dans le journal d'accès</li>
+<li>Cible des scénarios 1 et 3</li>
+</ul>
+</div>
+<div class="card">
+<h5>app-01 · le serveur applicatif</h5>
+<ul>
+<li>Une petite application Python avec une page de connexion et son <strong>journal au format maison</strong></li>
+<li>Apporte : les événements de gestion de comptes, et le format inconnu de Wazuh</li>
+<li>Cible des scénarios 4 et 5. C'est l'hôte le plus important du parc.</li>
+</ul>
+</div>
+<div class="card">
+<h5>files-01 · le serveur de fichiers</h5>
+<ul>
+<li>Un partage, et des répertoires déclarés au contrôle d'intégrité</li>
+<li>Apporte : les modifications de fichiers sensibles, famille d'événements qui ne vient d'aucun journal</li>
+<li>Cible du scénario 2</li>
+</ul>
+</div>
+<div class="card">
+<h5>attaquant · conteneur éphémère</h5>
+<ul>
+<li>Lancé à la demande, sans agent, sur le même réseau que le parc</li>
+<li>Porte les cinq scripts d'attaque, chacun écrivant son heure de début</li>
+<li>N'est pas surveillé : il est l'instrument de mesure, pas le sujet</li>
+</ul>
+</div>
+</div>
+
+<div class="box note">
+<h4>Pourquoi le contrôle d'intégrité mérite son hôte dédié</h4>
+<p style="margin-bottom:0">Les quatre autres familles d'événements viennent de journaux. Le contrôle d'intégrité est différent : l'agent calcule périodiquement les sommes de contrôle d'un ensemble de fichiers et compare. Aucun journal n'est impliqué. C'est donc le seul scénario qui démontre que la surveillance ne se réduit pas à la lecture de journaux, et c'est une distinction que le jury appréciera parce que l'énoncé, lui, ne parle que de journaux.</p>
+</div>
+
+<h3>Le contrat d'interface, à geler le jour 2</h3>
+<p>Le projet se répartit entre deux personnes selon une ligne nette : le parc et le durcissement d'un côté, la détection et la restitution de l'autre. Ces deux moitiés se touchent en trois points, et l'un des trois est un véritable goulot.</p>
+
+<pre># 1. Convention de nommage et groupes d'agents
+web-01   groupe : web,linux
+app-01   groupe : app,linux
+files-01 groupe : files,linux
+
+# 2. Champs de l'alerte sur lesquels Grafana s'appuie
+@timestamp   rule.id   rule.level   rule.description   agent.name   data.srcip
+index : wazuh-alerts-4.x-*
+
+# 3. Format exact du journal applicatif  <-- le goulot du projet
+chemin : /var/log/gestion/auth.log
+2026-11-20T14:03:11Z AUTH user=amine result=FAIL src=172.21.0.9 reason=badpass
+2026-11-20T14:03:14Z AUTH user=amine result=FAIL src=172.21.0.9 reason=badpass
+2026-11-20T14:05:02Z AUTH user=amine result=OK   src=172.21.0.4</pre>
+
+<div class="box warn">
+<h4>Le mode de panne propre à ce sujet</h4>
+<p style="margin-bottom:0">Le troisième point du contrat n'est pas symétrique comme les deux autres : c'est une <strong>dépendance en série</strong>. Celui qui écrit le décodeur ne peut pas commencer avant d'avoir trois lignes réelles du journal, avec leurs espaces et leur ponctuation exacts. Tant qu'elles n'existent pas, la moitié la plus valorisée du projet est à l'arrêt. C'est pourquoi le planning fait livrer ce format au jour 2, en même temps que les hôtes, et pas quand l'application sera finie.</p>
+</div>
+</section>
+<section id="archi-ctx">
+<span class="secno">SECTION 5</span>
+<h2>Architecture · vue de contexte</h2>
+<p>Le livrable 2 demande un schéma d'architecture et la justification des choix. L'architecture est présentée en trois vues normalisées, parce qu'un jury pose des questions à trois échelles différentes et qu'un diagramme unique répond mal aux trois.</p>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 400" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<defs>
+<marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#4a4f5a"/></marker>
+<marker id="c2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+</defs>
+<rect width="820" height="400" fill="#fffdfa"/>
+
+<rect x="22" y="128" width="154" height="92" rx="9" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.6"/>
+<text x="99" y="149" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0284c7" letter-spacing="1">&#171;PERSONNE&#187;</text>
+<text x="99" y="170" text-anchor="middle" font-size="13.5" font-weight="700" fill="#16181d">Analyste</text>
+<text x="99" y="189" text-anchor="middle" font-size="10.5" fill="#4a4f5a">Consulte les tableaux</text>
+<text x="99" y="203" text-anchor="middle" font-size="10.5" fill="#4a4f5a">de bord, recoit</text>
+<text x="99" y="217" text-anchor="middle" font-size="10.5" fill="#4a4f5a">les notifications</text>
+
+<rect x="252" y="104" width="252" height="156" rx="11" fill="#0c4a6e" stroke="#083344" stroke-width="1.6"/>
+<text x="378" y="130" text-anchor="middle" font-size="9.5" font-weight="700" fill="#a5e4fb" letter-spacing="1">SYSTEME ETUDIE</text>
+<text x="378" y="157" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Surveillance et</text>
+<text x="378" y="176" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">detection d'incidents</text>
+<text x="378" y="203" text-anchor="middle" font-size="10.5" fill="#cbeefb">Collecte des journaux,</text>
+<text x="378" y="218" text-anchor="middle" font-size="10.5" fill="#cbeefb">qualification des evenements,</text>
+<text x="378" y="233" text-anchor="middle" font-size="10.5" fill="#cbeefb">generation des alertes</text>
+
+<rect x="588" y="62" width="208" height="100" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="692" y="83" text-anchor="middle" font-size="9.5" font-weight="700" fill="#059669" letter-spacing="1">&#171;SYSTEME&#187;</text>
+<text x="692" y="104" text-anchor="middle" font-size="13" font-weight="700" fill="#064e3b">Parc Linux surveille</text>
+<text x="692" y="122" text-anchor="middle" font-size="10.5" fill="#047857">3 hotes conteneurises :</text>
+<text x="692" y="136" text-anchor="middle" font-size="10.5" fill="#047857">serveur web, serveur</text>
+<text x="692" y="150" text-anchor="middle" font-size="10.5" fill="#047857">applicatif, serveur de fichiers</text>
+
+<rect x="588" y="244" width="208" height="88" rx="9" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="6 3"/>
+<text x="692" y="265" text-anchor="middle" font-size="9.5" font-weight="700" fill="#b91c1c" letter-spacing="1">BANC D'ESSAI</text>
+<text x="692" y="286" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">Attaquant simule</text>
+<text x="692" y="304" text-anchor="middle" font-size="10.5" fill="#991b1b">Cinq scenarios scriptes,</text>
+<text x="692" y="318" text-anchor="middle" font-size="10.5" fill="#991b1b">horodates au declenchement</text>
+
+<path d="M692 240 L692 170" stroke="#b91c1c" stroke-width="1.6" marker-end="url(#c2)"/>
+<text x="702" y="208" font-size="10" font-weight="600" fill="#b91c1c">attaques</text>
+<text x="702" y="221" font-size="10" font-weight="600" fill="#b91c1c">scriptees</text>
+
+<path d="M584 128 L510 162" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#c1)"/>
+<text x="512" y="118" font-size="10" font-weight="600" fill="#4a4f5a">journaux et controle</text>
+<text x="512" y="131" font-size="10" font-weight="600" fill="#4a4f5a">d'integrite, canal</text>
+<text x="512" y="144" font-size="10" font-weight="600" fill="#4a4f5a">chiffre, port 1514</text>
+
+<path d="M248 182 L180 176" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#c1)"/>
+<text x="188" y="152" font-size="10" font-weight="600" fill="#4a4f5a">HTTPS,</text>
+<text x="188" y="165" font-size="10" font-weight="600" fill="#4a4f5a">webhook</text>
+
+<text x="22" y="378" font-size="10" fill="#848a96">Modele C4, niveau 1. L'attaquant est un banc d'essai, pas une menace reelle : il produit les evenements que la chaine doit qualifier.</text>
+</svg></div>
+<figcaption>Figure 1 · Modèle C4, niveau 1. Vue de contexte.</figcaption>
+</figure>
+
+<p>Deux décisions se défendent dans cette vue. La première est la frontière : le système étudié est la chaîne de surveillance, et le parc est un système voisin qu'elle observe. Cela empêche le projet de dériver vers l'administration système, et cela justifie que le parc soit minimal.</p>
+
+<p>La seconde est la présence de l'attaquant <strong>à l'intérieur du schéma, étiqueté banc d'essai</strong>. Ce n'est pas une menace modélisée, c'est un instrument de mesure : il produit à la demande les événements que la chaîne doit qualifier, et il les horodate. Sans lui, il n'y aurait rien à détecter et donc rien à mesurer. Le déclarer comme instrument plutôt que comme menace évite une confusion que beaucoup de dossiers de sécurité entretiennent.</p>
+</section>
+
+<section id="archi-cont">
+<span class="secno">SECTION 6</span>
+<h2>Architecture · vue des conteneurs</h2>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<defs>
+<marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#4a4f5a"/></marker>
+</defs>
+<rect width="820" height="500" fill="#fffdfa"/>
+
+<rect x="28" y="34" width="772" height="86" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5" stroke-dasharray="7 4"/>
+<text x="44" y="26" font-size="10.5" font-weight="700" fill="#059669" letter-spacing=".6">PARC SURVEILLE &#183; 3 CONTENEURS LINUX, CHACUN AVEC UN AGENT</text>
+<rect x="48" y="52" width="228" height="48" rx="6" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="162" y="71" text-anchor="middle" font-size="11.5" font-weight="700" fill="#064e3b">web-01</text>
+<text x="162" y="88" text-anchor="middle" font-size="9.5" fill="#047857">nginx &#183; sshd &#183; groupe web</text>
+<rect x="296" y="52" width="228" height="48" rx="6" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="410" y="71" text-anchor="middle" font-size="11.5" font-weight="700" fill="#064e3b">app-01</text>
+<text x="410" y="88" text-anchor="middle" font-size="9.5" fill="#047857">application &#183; journal maison</text>
+<rect x="544" y="52" width="228" height="48" rx="6" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="658" y="71" text-anchor="middle" font-size="11.5" font-weight="700" fill="#064e3b">files-01</text>
+<text x="658" y="88" text-anchor="middle" font-size="9.5" fill="#047857">partage &#183; controle d'integrite</text>
+
+<path d="M162 100 L162 142 M410 100 L410 142 M658 100 L658 142" stroke="#059669" stroke-width="1.4"/>
+<path d="M150 142 L670 142" stroke="#059669" stroke-width="1.6"/>
+<path d="M186 142 L186 194" stroke="#059669" stroke-width="1.8" marker-end="url(#m1)"/>
+<text x="196" y="164" font-size="10" font-weight="700" fill="#047857">journaux et evenements FIM</text>
+<text x="196" y="178" font-size="9.5" font-family="'JetBrains Mono', monospace" fill="#059669">TLS, port 1514</text>
+
+<rect x="28" y="196" width="772" height="276" rx="10" fill="#f7fbfd" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="7 4"/>
+<text x="44" y="190" font-size="10.5" font-weight="700" fill="#0284c7" letter-spacing=".6">PILE DE SURVEILLANCE &#183; RESEAU DOCKER INTERNE, NON PUBLIE</text>
+
+<rect x="48" y="216" width="228" height="96" rx="8" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.7"/>
+<text x="162" y="238" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0c4a6e">wazuh-manager</text>
+<text x="162" y="257" text-anchor="middle" font-size="9.5" fill="#075985">decodeurs, puis regles</text>
+<text x="162" y="272" text-anchor="middle" font-size="9.5" fill="#075985">ruleset par defaut</text>
+<text x="162" y="287" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0284c7">+ local_rules.xml, ecrit par nous</text>
+<text x="162" y="302" text-anchor="middle" font-size="9.5" fill="#075985">produit alerts.json</text>
+
+<rect x="296" y="216" width="228" height="96" rx="8" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.7"/>
+<text x="410" y="238" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4c1d95">wazuh-indexer</text>
+<text x="410" y="257" text-anchor="middle" font-size="9.5" fill="#6d28d9">stockage et recherche</text>
+<text x="410" y="274" text-anchor="middle" font-size="9.5" font-family="'JetBrains Mono', monospace" fill="#6d28d9">wazuh-alerts-4.x-*</text>
+<text x="410" y="291" text-anchor="middle" font-size="9.5" fill="#6d28d9">source unique pour les</text>
+<text x="410" y="305" text-anchor="middle" font-size="9.5" fill="#6d28d9">deux interfaces</text>
+
+<rect x="544" y="216" width="228" height="96" rx="8" fill="#f1efe9" stroke="#848a96" stroke-width="1.4"/>
+<text x="658" y="238" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4a4f5a">wazuh-dashboard</text>
+<text x="658" y="257" text-anchor="middle" font-size="9.5" fill="#848a96">console native</text>
+<text x="658" y="274" text-anchor="middle" font-size="9.5" fill="#848a96">sert a l'investigation</text>
+<text x="658" y="291" text-anchor="middle" font-size="9.5" fill="#848a96">et au reglage des regles,</text>
+<text x="658" y="305" text-anchor="middle" font-size="9.5" fill="#848a96">pas a la restitution</text>
+
+<rect x="296" y="352" width="228" height="96" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.7"/>
+<text x="410" y="374" text-anchor="middle" font-size="12.5" font-weight="700" fill="#78350f">Grafana</text>
+<text x="410" y="393" text-anchor="middle" font-size="9.5" fill="#92400e">source de donnees OpenSearch</text>
+<text x="410" y="410" text-anchor="middle" font-size="9.5" fill="#92400e">tableaux de bord : volume,</text>
+<text x="410" y="424" text-anchor="middle" font-size="9.5" fill="#92400e">niveau, regle, agent</text>
+<text x="410" y="441" text-anchor="middle" font-size="9.5" font-weight="700" fill="#b45309">+ 1 regle d'alerte evaluee</text>
+
+<rect x="544" y="352" width="228" height="96" rx="8" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="658" y="374" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7f1d1d">recepteur-notifications</text>
+<text x="658" y="393" text-anchor="middle" font-size="9.5" fill="#991b1b">petit service HTTP</text>
+<text x="658" y="410" text-anchor="middle" font-size="9.5" fill="#991b1b">journalise chaque</text>
+<text x="658" y="424" text-anchor="middle" font-size="9.5" fill="#991b1b">notification horodatee</text>
+<text x="658" y="441" text-anchor="middle" font-size="9.5" fill="#991b1b">remplace le courriel</text>
+
+<path d="M280 264 L292 264" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#m1)"/>
+<text x="286" y="256" text-anchor="middle" font-size="9" font-weight="600" fill="#4a4f5a"> </text>
+<path d="M528 264 L540 264" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#m1)"/>
+<path d="M410 316 L410 348" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#m1)"/>
+<text x="420" y="336" font-size="9.5" font-weight="600" fill="#4a4f5a">requetes de lecture</text>
+<path d="M528 400 L540 400" stroke="#4a4f5a" stroke-width="1.6" marker-end="url(#m1)"/>
+<text x="534" y="392" text-anchor="middle" font-size="9" font-weight="600" fill="#4a4f5a"> </text>
+<text x="190" y="334" font-size="9.5" font-weight="600" fill="#4a4f5a">ecrit les alertes</text>
+
+<text x="28" y="492" font-size="10" fill="#848a96">Modele C4, niveau 2. Seuls Grafana et la console sont joignables depuis le poste ; l'indexeur n'est publie sur aucun port.</text>
+</svg></div>
+<figcaption>Figure 2 · Modèle C4, niveau 2. Vue des conteneurs. L'indexeur est la source unique des deux interfaces.</figcaption>
+</figure>
+
+<div class="tw">
+<table>
+<thead><tr><th>Conteneur</th><th>Rôle</th><th>Pourquoi il est là</th></tr></thead>
+<tbody>
+<tr><td><strong>wazuh-manager</strong></td><td>Reçoit les événements, les décode, leur applique les règles, produit les alertes</td><td>C'est le seul endroit où la détection a lieu. Tout le reste transporte ou affiche.</td></tr>
+<tr><td><strong>wazuh-indexer</strong></td><td>Stocke et rend recherchables les alertes</td><td>Source unique de vérité. Les deux interfaces la lisent, aucune ne détient de copie.</td></tr>
+<tr><td>wazuh-dashboard</td><td>Console native d'investigation</td><td>Sert à régler les règles pendant le développement. Pas l'interface de restitution.</td></tr>
+<tr><td><strong>Grafana</strong></td><td>Tableaux de bord et règle d'alerte</td><td>Nommé dans l'énoncé. Porte la restitution et la génération d'alertes.</td></tr>
+<tr><td>récepteur</td><td>Service HTTP qui journalise chaque notification reçue</td><td>Remplace le courriel, et donne surtout un <strong>horodatage de notification exploitable</strong>.</td></tr>
+<tr><td>3 agents</td><td>Lisent les journaux, calculent les sommes de contrôle, expédient</td><td>Dans le parc, pas dans la pile. Ce sont eux qui font sortir la preuve de la machine.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+<h4>Le choix à défendre : deux interfaces, et ce n'est pas une redondance</h4>
+<p>Wazuh livre sa propre console, et l'énoncé demande Grafana. Un dossier maladroit mettrait les deux côte à côte en disant qu'elles font la même chose. Elles ne font pas la même chose, et savoir le dire est un point gagné.</p>
+<p style="margin-bottom:0">La console native est un outil d'<strong>investigation</strong> : elle connaît la structure des alertes Wazuh, elle sert à plonger dans un événement et à mettre une règle au point. Grafana est un outil de <strong>restitution et d'alerting</strong> : il agrège, il compare dans le temps, il évalue une condition et il notifie. Nous réglons les règles dans la première et nous présentons dans la seconde.</p>
+</div>
+
+<div class="box note">
+<h4>Et le récepteur de notifications, pourquoi ne pas faire plus simple</h4>
+<p style="margin-bottom:0">Parce qu'une notification qu'on ne peut pas horodater ne se mesure pas. Un serveur SMTP sortant est hors de portée, un canal de messagerie demanderait un compte extérieur. Un conteneur de vingt lignes qui reçoit une requête HTTP et écrit <code>heure, règle, hôte</code> dans un fichier donne exactement ce qu'il faut : la preuve que la notification est partie, et l'instant où elle est arrivée. C'est moins impressionnant qu'un message dans une messagerie, et c'est plus utile pour la section Mesures.</p>
+</div>
+</section>
+
+<section id="archi-deploy">
+<span class="secno">SECTION 7</span>
+<h2>Architecture · vue de déploiement</h2>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 516" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<defs>
+<marker id="n1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#4a4f5a"/></marker>
+</defs>
+<rect width="820" height="516" fill="#fffdfa"/>
+
+<rect x="22" y="32" width="776" height="442" rx="6" fill="#f6f4ef" stroke="#16181d" stroke-width="1.8"/>
+<text x="38" y="54" font-size="9.5" font-weight="700" fill="#848a96" letter-spacing="1">&#171;DEVICE&#187;</text>
+<text x="38" y="72" font-size="13.5" font-weight="700" fill="#16181d">Poste de travail &#183; Linux x86_64 &#183; 24 Go de RAM</text>
+
+<rect x="40" y="86" width="740" height="372" rx="6" fill="#fffdfa" stroke="#4a4f5a" stroke-width="1.5"/>
+<text x="56" y="106" font-size="9.5" font-weight="700" fill="#848a96" letter-spacing="1">&#171;EXECUTIONENVIRONMENT&#187;</text>
+<text x="56" y="122" font-size="12.5" font-weight="700" fill="#16181d">Docker Engine &#183; Docker Compose</text>
+
+<rect x="54" y="132" width="252" height="312" rx="6" fill="#f4fbf7" stroke="#059669" stroke-width="1.5"/>
+<text x="66" y="150" font-size="8.5" font-weight="700" fill="#059669" letter-spacing=".8">&#171;NETWORK&#187; net-parc</text>
+<text x="66" y="164" font-size="9" font-family="'JetBrains Mono', monospace" fill="#047857">172.21.0.0/24</text>
+
+<rect x="68" y="174" width="224" height="58" rx="5" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="80" y="191" font-size="8" font-weight="700" fill="#848a96" letter-spacing=".6">&#171;ARTIFACT&#187;</text>
+<text x="80" y="207" font-size="10.5" font-weight="700" fill="#064e3b">web-01</text>
+<text x="80" y="223" font-size="9" font-family="'JetBrains Mono', monospace" fill="#047857">nginx + sshd + wazuh-agent</text>
+
+<rect x="68" y="242" width="224" height="58" rx="5" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="80" y="259" font-size="8" font-weight="700" fill="#848a96" letter-spacing=".6">&#171;ARTIFACT&#187;</text>
+<text x="80" y="275" font-size="10.5" font-weight="700" fill="#064e3b">app-01</text>
+<text x="80" y="291" font-size="9" font-family="'JetBrains Mono', monospace" fill="#047857">python app + wazuh-agent</text>
+
+<rect x="68" y="310" width="224" height="58" rx="5" fill="#fff" stroke="#059669" stroke-width="1.3"/>
+<text x="80" y="327" font-size="8" font-weight="700" fill="#848a96" letter-spacing=".6">&#171;ARTIFACT&#187;</text>
+<text x="80" y="343" font-size="10.5" font-weight="700" fill="#064e3b">files-01</text>
+<text x="80" y="359" font-size="9" font-family="'JetBrains Mono', monospace" fill="#047857">samba + wazuh-agent</text>
+
+<rect x="68" y="378" width="224" height="52" rx="5" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text x="80" y="396" font-size="10" font-weight="700" fill="#7f1d1d">attaquant</text>
+<text x="80" y="411" font-size="9" fill="#991b1b">conteneur ephemere, lance a</text>
+<text x="80" y="424" font-size="9" fill="#991b1b">la demande, aucun agent</text>
+
+<rect x="330" y="248" width="150" height="126" rx="6" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.8"/>
+<text x="342" y="266" font-size="8" font-weight="700" fill="#848a96" letter-spacing=".6">&#171;ARTIFACT&#187;</text>
+<text x="405" y="286" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0c4a6e">wazuh-manager</text>
+<text x="405" y="306" text-anchor="middle" font-size="9" fill="#075985">seul conteneur attache</text>
+<text x="405" y="319" text-anchor="middle" font-size="9" fill="#075985">aux deux reseaux</text>
+<text x="405" y="340" text-anchor="middle" font-size="9" font-family="'JetBrains Mono', monospace" fill="#0284c7">1514 evenements</text>
+<text x="405" y="354" text-anchor="middle" font-size="9" font-family="'JetBrains Mono', monospace" fill="#0284c7">1515 enrolement</text>
+<text x="405" y="366" text-anchor="middle" font-size="8.5" fill="#075985">1,5 Go memoire</text>
+
+<rect x="504" y="132" width="276" height="312" rx="6" fill="#faf7fd" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="516" y="150" font-size="8.5" font-weight="700" fill="#7c3aed" letter-spacing=".8">&#171;NETWORK&#187; net-soc &#183; internal: true</text>
+<text x="516" y="164" font-size="9" fill="#6d28d9">aucun port publie vers l'hote</text>
+
+<rect x="518" y="174" width="248" height="58" rx="5" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.3"/>
+<text x="530" y="192" font-size="10.5" font-weight="700" fill="#4c1d95">wazuh-indexer</text>
+<text x="530" y="208" font-size="9" font-family="'JetBrains Mono', monospace" fill="#6d28d9">9200, interne seulement</text>
+<text x="530" y="223" font-size="9" fill="#6d28d9">tas 2 Go, vm.max_map_count requis</text>
+
+<rect x="518" y="242" width="248" height="58" rx="5" fill="#f1efe9" stroke="#848a96" stroke-width="1.3"/>
+<text x="530" y="260" font-size="10.5" font-weight="700" fill="#4a4f5a">wazuh-dashboard</text>
+<text x="530" y="276" font-size="9" font-family="'JetBrains Mono', monospace" fill="#848a96">443, publie sur 8443</text>
+<text x="530" y="291" font-size="9" fill="#848a96">console d'investigation</text>
+
+<rect x="518" y="310" width="248" height="58" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+<text x="530" y="328" font-size="10.5" font-weight="700" fill="#78350f">grafana</text>
+<text x="530" y="344" font-size="9" font-family="'JetBrains Mono', monospace" fill="#92400e">3000, publie sur 3000</text>
+<text x="530" y="359" font-size="9" fill="#92400e">tableaux de bord et regle d'alerte</text>
+
+<rect x="518" y="378" width="248" height="52" rx="5" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.3"/>
+<text x="530" y="396" font-size="10.5" font-weight="700" fill="#7f1d1d">recepteur-notifications</text>
+<text x="530" y="412" font-size="9" font-family="'JetBrains Mono', monospace" fill="#991b1b">8080, interne seulement</text>
+<text x="530" y="425" font-size="9" fill="#991b1b">journal horodate des notifications</text>
+
+<path d="M306 292 L326 292" stroke="#059669" stroke-width="1.8" marker-end="url(#n1)"/>
+<path d="M484 312 L500 312" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#n1)"/>
+
+<text x="22" y="500" font-size="10" fill="#848a96">UML 2.5, diagramme de deploiement. Le manager est le seul point de passage entre le parc et la pile : un hote compromis ne voit jamais l'indexeur.</text>
+</svg></div>
+<figcaption>Figure 3 · UML 2.5, diagramme de déploiement. Deux réseaux Docker distincts, et un seul point de passage entre eux.</figcaption>
+</figure>
+
+<p>Cette vue porte la seule décision de sécurité qui soit structurelle plutôt qu'ajoutée. Deux réseaux Docker séparés : <code>net-parc</code>, où vivent les hôtes surveillés et l'attaquant, et <code>net-soc</code>, déclaré <code>internal: true</code>, où vivent l'indexeur et les interfaces.</p>
+
+<p>Le gestionnaire est le <strong>seul conteneur attaché aux deux</strong>. Il reçoit les événements d'un côté et écrit les alertes de l'autre. Aucun hôte du parc n'a de route vers l'indexeur. La conséquence est directe et se dit en une phrase : un hôte compromis peut mentir sur ce qu'il envoie, il ne peut pas effacer ce qui est déjà stocké.</p>
+
+<div class="box key">
+<h4>Pourquoi cette décision vaut mieux qu'une liste de mesures de sécurité</h4>
+<p style="margin-bottom:0">On peut durcir une machine par vingt réglages, et chacun peut être oublié. Un cloisonnement réseau est une propriété de l'architecture : elle ne dépend pas d'un réglage juste, elle découle de la topologie. En soutenance, montrer qu'une connexion de <code>web-01</code> vers l'indexeur expire est plus convaincant qu'une liste de durcissements, parce que c'est vérifiable en direct et que cela ne repose sur la bonne volonté de personne.</p>
+</div>
+
+<div class="box warn">
+<h4>Les limites de cette architecture, énoncées avant la question</h4>
+<p>Un seul gestionnaire : sa panne arrête la détection, et les agents gardent leurs événements en file d'attente pendant un temps limité avant d'en perdre.</p>
+<p>Un seul nœud d'indexation : les alertes ne sont pas répliquées, et le volume stocké est borné par le disque du poste.</p>
+<p style="margin-bottom:0">Et la limite la plus importante, parce qu'elle est conceptuelle : <strong>la chaîne détecte ce que les règles décrivent</strong>. Une attaque qui ne ressemble à aucune règle ne produit aucune alerte, et le tableau de bord reste vert. Le scénario 5 existe précisément pour rendre cette limite visible au lieu de la laisser implicite.</p>
+</div>
+</section>
+<section id="chaine">
+<span class="secno">SECTION 8</span>
+<h2>La chaîne de détection</h2>
+<p>Cette section est le centre du dossier. Elle décrit ce qui se passe entre le moment où une attaque produit une ligne de journal et le moment où une notification part, puis elle montre la partie que nous écrivons nous mêmes.</p>
+
+<h3>Les quatre étapes, dans l'ordre</h3>
+<div class="step"><div class="stepn">1</div><div class="stept">Collecte</div>
+<div class="stepd">L'agent suit les fichiers déclarés et expédie chaque nouvelle ligne au gestionnaire, chiffrée, sur le port 1514. En parallèle, il calcule les sommes de contrôle des répertoires surveillés. Rien n'est analysé localement : l'agent transporte.</div></div>
+<div class="step"><div class="stepn">2</div><div class="stept">Décodage</div>
+<div class="stepd">Le gestionnaire cherche un décodeur capable de reconnaître la ligne, et en extrait des champs nommés : utilisateur, adresse source, résultat. <strong>Sans décodeur, la ligne reste une chaîne de caractères</strong> et aucune règle ne peut raisonner dessus. C'est l'étape que les projets ignorent, et c'est pourtant celle qui bloque le scénario 5.</div></div>
+<div class="step"><div class="stepn">3</div><div class="stept">Qualification par règles</div>
+<div class="stepd">Les règles s'appliquent aux champs décodés et attribuent un niveau de 0 à 15. Deux familles distinctes : les règles <em>atomiques</em>, qui jugent une ligne seule, et les règles de <em>corrélation</em>, qui comptent des occurrences sur une fenêtre de temps. La seconde famille est celle qui transforme cinq incidents banals en une alerte sérieuse.</div></div>
+<div class="step"><div class="stepn">4</div><div class="stept">Restitution et notification</div>
+<div class="stepd">L'alerte est écrite dans l'indexeur. Grafana l'y lit pour ses tableaux de bord, et sa règle d'alerte évalue périodiquement une condition. Si la condition est vraie, une notification part vers le récepteur, qui l'horodate.</div></div>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 596" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<defs>
+<marker id="q1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#16181d"/></marker>
+<marker id="q2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#4a4f5a" stroke-width="1.4"/></marker>
+</defs>
+<rect width="820" height="596" fill="#fffdfa"/>
+
+<rect x="20" y="26" width="120" height="46" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.4"/>
+<text x="80" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#064e3b">app-01</text>
+<text x="80" y="61" text-anchor="middle" font-size="8.5" fill="#047857">journal applicatif</text>
+<rect x="155" y="26" width="120" height="46" rx="5" fill="#ecfdf5" stroke="#059669" stroke-width="1.4"/>
+<text x="215" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#064e3b">wazuh-agent</text>
+<text x="215" y="61" text-anchor="middle" font-size="8.5" fill="#047857">logcollector</text>
+<rect x="285" y="26" width="150" height="46" rx="5" fill="#0c4a6e" stroke="#083344" stroke-width="1.4"/>
+<text x="360" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff">wazuh-manager</text>
+<text x="360" y="61" text-anchor="middle" font-size="8.5" fill="#a5e4fb">decodeurs puis regles</text>
+<rect x="445" y="26" width="120" height="46" rx="5" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.4"/>
+<text x="505" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4c1d95">indexer</text>
+<text x="505" y="61" text-anchor="middle" font-size="8.5" fill="#6d28d9">wazuh-alerts-4.x</text>
+<rect x="575" y="26" width="120" height="46" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1.4"/>
+<text x="635" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#78350f">Grafana</text>
+<text x="635" y="61" text-anchor="middle" font-size="8.5" fill="#92400e">regle d'alerte</text>
+<rect x="700" y="26" width="112" height="46" rx="5" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.4"/>
+<text x="756" y="45" text-anchor="middle" font-size="10.5" font-weight="700" fill="#7f1d1d">recepteur</text>
+<text x="756" y="61" text-anchor="middle" font-size="8.5" fill="#991b1b">journal horodate</text>
+
+<g stroke="#b8b2a6" stroke-width="1.1" stroke-dasharray="4 4">
+<line x1="80" y1="72" x2="80" y2="508"/><line x1="215" y1="72" x2="215" y2="508"/>
+<line x1="360" y1="72" x2="360" y2="508"/><line x1="505" y1="72" x2="505" y2="508"/>
+<line x1="635" y1="72" x2="635" y2="508"/><line x1="756" y1="72" x2="756" y2="508"/></g>
+
+<circle cx="10" cy="100" r="4" fill="#b91c1c"/>
+<path d="M14 100 L72 100" stroke="#b91c1c" stroke-width="1.5" marker-end="url(#q1)"/>
+<text x="92" y="96" font-size="9.5" font-weight="700" fill="#b91c1c">5 echecs d'authentification depuis 172.21.0.9, repartis sur 40 s</text>
+
+<rect x="14" y="120" width="432" height="146" rx="3" fill="none" stroke="#4a4f5a" stroke-width="1.2"/>
+<path d="M14 120 h64 v18 h-54 l-10 -9 z" fill="#f1efe9" stroke="#4a4f5a" stroke-width="1.2"/>
+<text x="22" y="133" font-size="9" font-weight="700" fill="#16181d">loop</text>
+<text x="84" y="133" font-size="9" fill="#4a4f5a">[pour chaque ligne de journal produite]</text>
+
+<path d="M80 154 L128 154 L128 170 L86 170" fill="none" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="136" y="166" font-size="9.5" fill="#16181d">une ligne ajoutee a <tspan font-family="'JetBrains Mono', monospace">/var/log/gestion/auth.log</tspan></text>
+
+<path d="M86 192 L209 192" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="94" y="188" font-size="9.5" fill="#16181d">lecture en continu</text>
+
+<path d="M221 216 L354 216" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="229" y="212" font-size="9.5" font-family="'JetBrains Mono', monospace" fill="#16181d">evenement brut, TLS 1514</text>
+
+<path d="M360 238 L412 238 L412 254 L366 254" fill="none" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="420" y="250" font-size="9.5" font-weight="700" fill="#0284c7">decodeur maison : extrait srcip et user</text>
+
+<path d="M360 288 L412 288 L412 304 L366 304" fill="none" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="420" y="300" font-size="9.5" fill="#16181d">regle 100001, niveau 5, une alerte par ligne</text>
+
+<rect x="290" y="322" width="420" height="98" rx="3" fill="none" stroke="#b45309" stroke-width="1.2"/>
+<path d="M290 322 h56 v18 h-46 l-10 -9 z" fill="#fef3c7" stroke="#b45309" stroke-width="1.2"/>
+<text x="298" y="335" font-size="9" font-weight="700" fill="#78350f">opt</text>
+<text x="352" y="335" font-size="9" fill="#92400e">[5 occurrences en moins de 60 s]</text>
+
+<path d="M360 358 L412 358 L412 374 L366 374" fill="none" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="420" y="362" font-size="9.5" font-weight="700" fill="#b45309">regle 100002, niveau 10</text>
+<text x="420" y="375" font-size="9" font-family="'JetBrains Mono', monospace" fill="#92400e">frequency=5 timeframe=60</text>
+
+<path d="M366 404 L499 404" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="374" y="400" font-size="9.5" fill="#16181d">ecrit l'alerte</text>
+
+<rect x="450" y="436" width="366" height="98" rx="3" fill="none" stroke="#d97706" stroke-width="1.2"/>
+<path d="M450 436 h64 v18 h-54 l-10 -9 z" fill="#fef3c7" stroke="#d97706" stroke-width="1.2"/>
+<text x="458" y="449" font-size="9" font-weight="700" fill="#78350f">loop</text>
+<text x="520" y="449" font-size="9" fill="#92400e">[evaluation toutes les 10 s]</text>
+
+<path d="M629 472 L511 472" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="518" y="468" font-size="9" font-family="'JetBrains Mono', monospace" fill="#16181d">count(rule.level&#8805;10, 5 min)</text>
+<path d="M511 492 L629 492" stroke="#4a4f5a" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#q2)"/>
+<text x="560" y="488" font-size="9" fill="#4a4f5a">n</text>
+<path d="M641 520 L750 520" stroke="#16181d" stroke-width="1.3" marker-end="url(#q1)"/>
+<text x="648" y="516" font-size="9" fill="#b91c1c">si n &gt; 0 : notification</text>
+
+<rect x="14" y="548" width="500" height="34" rx="4" fill="#eaf7ed" stroke="#15803d" stroke-width="1.2"/>
+<text x="26" y="563" font-size="9.5" font-weight="700" fill="#14532d">Deux latences a mesurer separement, et elles n'ont pas la meme cause.</text>
+<text x="26" y="576" font-size="9" fill="#166534">Attaque vers alerte indexee : le manager. Alerte vers notification : l'intervalle d'evaluation de Grafana.</text>
+
+<text x="528" y="566" font-size="9" fill="#848a96">UML 2.5, diagramme</text>
+<text x="528" y="578" font-size="9" fill="#848a96">de sequence.</text>
+</svg></div>
+<figcaption>Figure 4 · UML 2.5, diagramme de séquence. Le scénario 5 de bout en bout, avec la règle atomique dans la boucle et la règle de corrélation dans le fragment d'option.</figcaption>
+</figure>
+
+<h3>Le décodeur, écrit par nous</h3>
+<p>Le journal de l'application maison a un format que Wazuh ne connaît pas. Deux décodeurs sont nécessaires : un parent qui reconnaît la famille de lignes, un enfant qui en extrait les champs.</p>
+
+<pre>&lt;!-- /var/ossec/etc/decoders/local_decoder.xml --&gt;
+&lt;decoder name="gestion-auth"&gt;
+  &lt;prematch&gt;^\d\d\d\d-\d\d-\d\dT\S+ AUTH &lt;/prematch&gt;
+&lt;/decoder&gt;
+
+&lt;decoder name="gestion-auth-champs"&gt;
+  &lt;parent&gt;gestion-auth&lt;/parent&gt;
+  &lt;regex offset="after_prematch"&gt;user=(\S+) result=(\S+) src=(\S+)&lt;/regex&gt;
+  &lt;order&gt;srcuser, status, srcip&lt;/order&gt;
+&lt;/decoder&gt;</pre>
+
+<p>Le choix de nommer les champs <code>srcuser</code>, <code>status</code> et <code>srcip</code> n'est pas arbitraire : ce sont des champs que Wazuh connaît, donc les règles de corrélation livrées savent déjà les utiliser, et Grafana les retrouve sous des noms cohérents avec les autres alertes. Inventer des noms de champs aurait fonctionné aussi, et aurait isolé ces alertes du reste.</p>
+
+<h3>Les règles, écrites par nous</h3>
+<pre>&lt;!-- /var/ossec/etc/rules/local_rules.xml --&gt;
+&lt;group name="gestion,authentification"&gt;
+
+  &lt;!-- atomique : une ligne, un echec --&gt;
+  &lt;rule id="100001" level="5"&gt;
+    &lt;decoded_as&gt;gestion-auth&lt;/decoded_as&gt;
+    &lt;field name="status"&gt;^FAIL$&lt;/field&gt;
+    &lt;description&gt;Gestion : echec d'authentification pour $(srcuser) depuis $(srcip)&lt;/description&gt;
+    &lt;group&gt;authentication_failed,&lt;/group&gt;
+  &lt;/rule&gt;
+
+  &lt;!-- correlation : 5 echecs en 60 s, depuis la meme adresse --&gt;
+  &lt;rule id="100002" level="10" frequency="5" timeframe="60"&gt;
+    &lt;if_matched_sid&gt;100001&lt;/if_matched_sid&gt;
+    &lt;same_source_ip /&gt;
+    &lt;description&gt;Gestion : force brute probable depuis $(srcip)&lt;/description&gt;
+    &lt;group&gt;authentication_failures,&lt;/group&gt;
+  &lt;/rule&gt;
+
+  &lt;!-- succes apres echecs : plus grave qu'un succes isole --&gt;
+  &lt;rule id="100003" level="12"&gt;
+    &lt;if_matched_sid&gt;100002&lt;/if_matched_sid&gt;
+    &lt;decoded_as&gt;gestion-auth&lt;/decoded_as&gt;
+    &lt;field name="status"&gt;^OK$&lt;/field&gt;
+    &lt;same_source_ip /&gt;
+    &lt;description&gt;Gestion : authentification reussie apres une force brute, depuis $(srcip)&lt;/description&gt;
+  &lt;/rule&gt;
+
+&lt;/group&gt;</pre>
+
+<div class="box key">
+<h4>La règle 100003 est celle qu'il faut présenter en premier</h4>
+<p>Les deux premières règles sont du travail correct. La troisième est du raisonnement de sécurité, et elle tient en une phrase : une authentification réussie n'est pas un incident, sauf quand elle suit immédiatement une rafale d'échecs depuis la même adresse. Là, elle signifie probablement que l'attaque a abouti, et son niveau passe au dessus de celui de l'attaque elle même.</p>
+<p style="margin-bottom:0">C'est exactement le type de règle qu'aucun jeu de règles générique ne peut écrire, parce qu'il faut connaître l'application pour savoir ce que <code>result=OK</code> veut dire. Si une seule chose doit être expliquée au tableau pendant la soutenance, c'est celle là.</p>
+</div>
+
+<h3>La boucle de développement, qui évite de perdre une semaine</h3>
+<p>Une erreur classique consiste à tester une règle en relançant l'attaque, en attendant, et en cherchant dans la console. Chaque essai prend plusieurs minutes et le projet n'en fait alors que quelques dizaines. Il existe un outil fait pour cela.</p>
+
+<pre># coller une ligne de journal, voir quel decodeur et quelle regle matchent
+$ /var/ossec/bin/wazuh-logtest
+2026-11-20T14:03:11Z AUTH user=amine result=FAIL src=172.21.0.9 reason=badpass
+
+**Phase 2: Completed decoding.
+        name: 'gestion-auth'
+        srcuser: 'amine'
+        status: 'FAIL'
+        srcip: '172.21.0.9'
+**Phase 3: Completed filtering (rules).
+        id: '100001'
+        level: '5'</pre>
+
+<p>Le cycle passe de plusieurs minutes à quelques secondes, et il permet de mettre au point une expression régulière en travaillant sur une ligne copiée. Pour la règle de corrélation, coller la même ligne cinq fois de suite fait apparaître la règle 100002. Cet outil est à découvrir au jour 1, pas au jour 7.</p>
+
+<h3>Le contrôle d'intégrité, et son réglage de latence</h3>
+<pre>&lt;syscheck&gt;
+  &lt;frequency&gt;3600&lt;/frequency&gt;
+  &lt;directories check_all="yes" realtime="yes"&gt;/etc&lt;/directories&gt;
+  &lt;directories check_all="yes" realtime="yes"&gt;/srv/partage&lt;/directories&gt;
+&lt;/syscheck&gt;</pre>
+
+<div class="box warn">
+<h4>Sans <code>realtime="yes"</code>, le scénario 2 semble ne pas fonctionner</h4>
+<p style="margin-bottom:0">Par défaut, le contrôle d'intégrité repasse sur les fichiers toutes les douze heures. Une modification faite pendant la démonstration ne produirait donc aucune alerte avant le lendemain, et un groupe mal préparé conclura que son installation est cassée. L'attribut <code>realtime</code> fait surveiller le répertoire par le noyau, et l'alerte devient quasi immédiate. La valeur de <code>frequency</code> reste utile comme filet de sécurité pour ce que la surveillance temps réel manque, par exemple après un redémarrage de l'agent. Les deux coexistent, et savoir pourquoi est une bonne réponse de soutenance.</p>
+</div>
+</section>
+
+<section id="stack">
+<span class="secno">SECTION 9</span>
+<h2>Choix technologiques et justification</h2>
+<p>L'énoncé nomme quatre technologies : Linux, Wazuh, Grafana, Docker. Le projet s'y tient, et chaque ajout est justifié par un besoin de la section Mesures.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Technologie</th><th>Rôle</th><th>Justification</th><th>Statut</th></tr></thead>
+<tbody>
+<tr><td><strong>Linux</strong></td><td>Les trois hôtes surveillés</td><td>Nommé dans l'énoncé. Fournit les journaux système et les mécanismes de contrôle d'intégrité.</td><td>Énoncé</td></tr>
+<tr><td><strong>Wazuh</strong></td><td>Agents, gestionnaire, décodeurs, règles, indexeur</td><td>Nommé dans l'énoncé. Porte les étapes 1 à 3 de la chaîne.</td><td>Énoncé</td></tr>
+<tr><td><strong>Grafana</strong></td><td>Tableaux de bord et règle d'alerte</td><td>Nommé dans l'énoncé. Porte l'étape 4, celle que l'énoncé appelle génération d'alertes.</td><td>Énoncé</td></tr>
+<tr><td><strong>Docker</strong></td><td>Toute la pile et tout le parc</td><td>Nommé dans l'énoncé. Permet aussi les deux réseaux cloisonnés, qui portent la sécurité structurelle.</td><td>Énoncé</td></tr>
+<tr><td>Source OpenSearch</td><td>Connecte Grafana à l'indexeur</td><td>Greffon de Grafana. L'indexeur Wazuh est un OpenSearch, donc c'est la source prévue pour cela.</td><td>Greffon</td></tr>
+<tr><td>récepteur maison</td><td>Reçoit et horodate les notifications</td><td>Vingt lignes de Python. Sans lui, la latence de notification n'est pas mesurable.</td><td>Écrit par nous</td></tr>
+<tr><td>Scripts d'attaque</td><td>Produisent les cinq scénarios</td><td>Boucles shell et <code>curl</code>. Chacun écrit son heure de début, ce qui sert de référence aux latences.</td><td>Écrit par nous</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box note">
+<h4>Ce que le projet n'utilise pas, et pourquoi</h4>
+<p>Pas de pile Elastic séparée. L'indexeur livré avec Wazuh est déjà un moteur de recherche de cette famille : en ajouter une seconde dupliquerait le stockage et doublerait la consommation mémoire sans rien démontrer de plus.</p>
+<p>Pas de réponse active. Le mécanisme est décrit en section 2, il n'est pas armé, et la raison est explicite.</p>
+<p style="margin-bottom:0">Pas de notification par courriel ni par messagerie. L'une demande un relais SMTP sortant, l'autre un compte extérieur. Les deux produiraient une démonstration dépendante du réseau de la salle.</p>
+</div>
+
+<div class="box key">
+<h4>La consommation mémoire, chiffrée à l'avance</h4>
+<p>Avec 24 Go disponibles, la pile complète tient sans arbitrage. L'ordre de grandeur, utile pour répondre à la question en soutenance :</p>
+<pre>wazuh-indexer      2 a 3 Go   tas Java, c'est le poste dominant
+wazuh-manager      1 a 1,5 Go
+wazuh-dashboard    0,5 a 1 Go
+grafana            ~200 Mo
+3 agents + parc    ~150 Mo chacun
+recepteur          negligeable
+                   ---------
+total              5 a 6,5 Go</pre>
+<p style="margin-bottom:0">Un réglage reste obligatoire quelle que soit la mémoire disponible : <code>vm.max_map_count</code> doit valoir au moins 262144 sur l'hôte, sinon l'indexeur refuse de démarrer. C'est la panne la plus fréquente de la première heure, et elle n'a rien à voir avec la quantité de RAM.</p>
+</div>
+</section>
+<section id="secu">
+<span class="secno">SECTION 10</span>
+<h2>Sécurité</h2>
+<p>Le livrable 4 demande l'authentification, le contrôle d'accès et la protection des données. Ce sujet a une particularité : l'objet du projet est déjà un outil de sécurité. La question n'est donc pas de sécuriser une application, c'est de <strong>sécuriser la chaîne de surveillance elle même</strong>, et c'est un angle que le jury n'attend pas forcément.</p>
+
+<div class="box key">
+<h4>L'argument qui ouvre cette section</h4>
+<p style="margin-bottom:0">Une chaîne de surveillance est une cible de valeur. Elle centralise les journaux de tout le parc, donc elle sait où sont les faiblesses. Elle dispose d'un canal entrant depuis chaque machine surveillée. Et si un attaquant la compromet, il obtient deux choses d'un coup : la carte du système, et la capacité de faire disparaître les traces de son passage. Une pile de détection mal protégée aggrave le risque qu'elle est censée réduire.</p>
+</div>
+
+<h3>Cinq mesures, et la démonstration de chacune</h3>
+<div class="two">
+<div class="card">
+<h5>1 · Cloisonnement réseau</h5>
+<ul>
+<li>Deux réseaux Docker, <code>net-soc</code> déclaré <code>internal: true</code></li>
+<li>Le gestionnaire est le seul pont entre les deux</li>
+<li><strong>Démonstration :</strong> depuis <code>web-01</code>, une connexion au port 9200 de l'indexeur expire</li>
+</ul>
+</div>
+<div class="card">
+<h5>2 · Canal agent vers gestionnaire chiffré</h5>
+<ul>
+<li>Chiffrement du canal 1514, et enrôlement authentifié sur 1515</li>
+<li>Une clé par agent, générée à l'enrôlement</li>
+<li><strong>Démonstration :</strong> capture sur <code>net-parc</code> pendant une attaque, la charge utile est illisible</li>
+</ul>
+</div>
+<div class="card">
+<h5>3 · Mots de passe par défaut remplacés</h5>
+<ul>
+<li>Les images Wazuh livrent des identifiants documentés publiquement</li>
+<li>Remplacés pour l'indexeur, la console et l'API, avant tout enrôlement</li>
+<li><strong>Démonstration :</strong> les identifiants de la documentation officielle sont refusés</li>
+</ul>
+</div>
+<div class="card">
+<h5>4 · Surface d'écoute réduite</h5>
+<ul>
+<li>Seuls deux ports sont publiés vers l'hôte : la console et Grafana</li>
+<li>Indexeur, API et récepteur restent internes au réseau Docker</li>
+<li><strong>Démonstration :</strong> <code>docker compose ps</code> et un balayage de ports sur l'hôte</li>
+</ul>
+</div>
+<div class="card">
+<h5>5 · Intégrité de la preuve</h5>
+<ul>
+<li>L'événement est expédié à la production, pas à la lecture</li>
+<li>L'agent n'a aucun droit de suppression côté gestionnaire</li>
+<li><strong>Démonstration :</strong> attaque, puis <code>truncate -s 0 /var/log/auth.log</code> sur l'hôte : l'alerte reste</li>
+</ul>
+</div>
+<div class="card">
+<h5>Ce qui reste hors périmètre</h5>
+<ul>
+<li>Chiffrement au repos des données de l'indexeur</li>
+<li>Journal d'audit des actions des analystes</li>
+<li>Rotation et conservation à long terme des alertes</li>
+</ul>
+</div>
+</div>
+
+<div class="box warn">
+<h4>La limite conceptuelle, à énoncer vous mêmes</h4>
+<p>Un agent compromis reste une faille que cette architecture ne ferme pas. L'attaquant ne peut pas effacer les alertes passées, mais il peut arrêter l'agent, et à partir de cet instant plus rien ne remonte de cette machine.</p>
+<p style="margin-bottom:0">La parade existe et nous la nommons sans la réaliser : surveiller l'absence de signal. Wazuh émet un événement quand un agent passe en état déconnecté, et une règle sur cet événement transforme le silence en alerte. Le dire, c'est montrer qu'on a pensé au cas où l'outil est attaqué, ce qui est le réflexe que le critère bonnes pratiques récompense.</p>
+</div>
+</section>
+
+<section id="mesures">
+<span class="secno">SECTION 11</span>
+<h2>Matrice de détection et latences</h2>
+<p>Le livrable 5 demande une démonstration fonctionnelle et des tests. Pour une chaîne de détection, la bonne mesure n'est ni un temps de réponse ni un débit : c'est <strong>ce qui est détecté, ce qui ne l'est pas, et en combien de temps</strong>.</p>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<rect width="820" height="500" fill="#fffdfa"/>
+<text x="18" y="24" font-size="11" font-weight="700" fill="#16181d">MATRICE DE DETECTION &#183; CINQ SCENARIOS CONFRONTES AU JEU DE REGLES PAR DEFAUT</text>
+<text x="18" y="42" font-size="10" fill="#848a96">Chaque scenario est un script horodate. La derniere colonne est renseignee par la mesure, pas par l'intention.</text>
+<rect x="18" y="58" width="784" height="28" fill="#16181d"/>
+<text x="26" y="77" font-size="9.5" font-weight="700" fill="#fffdfa" letter-spacing=".5">SCENARIO</text>
+<text x="300" y="77" font-size="9.5" font-weight="700" fill="#fffdfa" letter-spacing=".5">REGLE ATTENDUE</text>
+<text x="438" y="77" font-size="9.5" font-weight="700" fill="#fffdfa" letter-spacing=".5">NIVEAU</text>
+<text x="500" y="77" font-size="9.5" font-weight="700" fill="#fffdfa" letter-spacing=".5">RULESET PAR DEFAUT</text>
+<text x="630" y="77" font-size="9.5" font-weight="700" fill="#fffdfa" letter-spacing=".5">LATENCE RELEVEE</text>
+<rect x="18" y="86" width="784" height="56" fill="#fffdfa" stroke="#e3ded5" stroke-width="1"/>
+<text x="26" y="110" font-size="10.5" font-weight="700" fill="#16181d">1 &#183; Force brute SSH sur web-01</text>
+<text x="26" y="128" font-size="9.5" fill="#848a96">hydra, 20 essais en 30 s</text>
+<text x="300" y="120" font-size="10" font-family="'JetBrains Mono', monospace" fill="#4a4f5a">5712</text>
+<text x="449" y="120" font-size="11" font-weight="700" fill="#16181d">10</text>
+<rect x="500" y="102" width="56" height="24" rx="12" fill="#eaf7ed" stroke="#15803d" stroke-width="1.3"/>
+<text x="528" y="118" text-anchor="middle" font-size="10" font-weight="700" fill="#14532d">oui</text>
+<text x="630" y="120" font-size="10" fill="#4a4f5a">moins de 5 s</text>
+<rect x="18" y="142" width="784" height="56" fill="#fffdfa" stroke="#e3ded5" stroke-width="1"/>
+<text x="26" y="166" font-size="10.5" font-weight="700" fill="#16181d">2 &#183; Modification de /etc/passwd</text>
+<text x="26" y="184" font-size="9.5" fill="#848a96">sur files-01, controle d'integrite</text>
+<text x="300" y="176" font-size="10" font-family="'JetBrains Mono', monospace" fill="#4a4f5a">550 / 554</text>
+<text x="449" y="176" font-size="11" font-weight="700" fill="#16181d">7</text>
+<rect x="500" y="158" width="56" height="24" rx="12" fill="#fef3c7" stroke="#b45309" stroke-width="1.3"/>
+<text x="528" y="174" text-anchor="middle" font-size="10" font-weight="700" fill="#78350f">oui</text>
+<text x="630" y="176" font-size="10" fill="#4a4f5a">lie au cycle FIM</text>
+<rect x="18" y="198" width="784" height="56" fill="#fffdfa" stroke="#e3ded5" stroke-width="1"/>
+<text x="26" y="222" font-size="10.5" font-weight="700" fill="#16181d">3 &#183; Injection SQL dans une URL</text>
+<text x="26" y="240" font-size="9.5" fill="#848a96">journal d'acces nginx de web-01</text>
+<text x="300" y="232" font-size="10" font-family="'JetBrains Mono', monospace" fill="#4a4f5a">31103</text>
+<text x="449" y="232" font-size="11" font-weight="700" fill="#16181d">7</text>
+<rect x="500" y="214" width="56" height="24" rx="12" fill="#eaf7ed" stroke="#15803d" stroke-width="1.3"/>
+<text x="528" y="230" text-anchor="middle" font-size="10" font-weight="700" fill="#14532d">oui</text>
+<text x="630" y="232" font-size="10" fill="#4a4f5a">moins de 5 s</text>
+<rect x="18" y="254" width="784" height="56" fill="#fffdfa" stroke="#e3ded5" stroke-width="1"/>
+<text x="26" y="278" font-size="10.5" font-weight="700" fill="#16181d">4 &#183; Ajout d'un compte au groupe sudo</text>
+<text x="26" y="296" font-size="9.5" fill="#848a96">sur app-01</text>
+<text x="300" y="288" font-size="10" font-family="'JetBrains Mono', monospace" fill="#4a4f5a">5902 / 5904</text>
+<text x="449" y="288" font-size="11" font-weight="700" fill="#16181d">8</text>
+<rect x="500" y="270" width="56" height="24" rx="12" fill="#eaf7ed" stroke="#15803d" stroke-width="1.3"/>
+<text x="528" y="286" text-anchor="middle" font-size="10" font-weight="700" fill="#14532d">oui</text>
+<text x="630" y="288" font-size="10" fill="#4a4f5a">moins de 5 s</text>
+<rect x="18" y="310" width="784" height="56" fill="#fffbfb" stroke="#e3ded5" stroke-width="1"/>
+<rect x="18" y="310" width="784" height="56" fill="none" stroke="#b91c1c" stroke-width="1.8"/>
+<text x="26" y="334" font-size="10.5" font-weight="700" fill="#16181d">5 &#183; Echecs d'authentification applicatifs</text>
+<text x="26" y="352" font-size="9.5" fill="#848a96">journal maison de app-01, format non standard</text>
+<text x="300" y="344" font-size="10" font-family="'JetBrains Mono', monospace" fill="#4a4f5a">aucune</text>
+<text x="449" y="344" font-size="11" font-weight="700" fill="#16181d">&#8212;</text>
+<rect x="500" y="326" width="56" height="24" rx="12" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.3"/>
+<text x="528" y="342" text-anchor="middle" font-size="10" font-weight="700" fill="#7f1d1d">non</text>
+<text x="630" y="344" font-size="10" fill="#4a4f5a">non detecte</text>
+<rect x="18" y="380" width="784" height="86" rx="6" fill="#fdeaea" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="32" y="404" font-size="10.5" font-weight="700" fill="#7f1d1d">La ligne 5 est le projet. Les quatre autres sont le banc d'essai.</text>
+<text x="32" y="424" font-size="10" fill="#991b1b">Les scenarios 1 a 4 sont couverts par le jeu de regles livre : les montrer prouve que la chaine fonctionne, pas que nous l'avons comprise.</text>
+<text x="32" y="441" font-size="10" fill="#991b1b">Le scenario 5 passe sous le radar parce que le format du journal est propre a l'application. Il faut ecrire le decodeur, puis deux regles :</text>
+<text x="32" y="458" font-size="10" font-family="'JetBrains Mono', monospace" fill="#7f1d1d">100001 (niveau 5, une par echec) puis 100002 (niveau 10, frequency=5 timeframe=60). C'est la seule partie que personne d'autre n'a ecrite.</text>
+<text x="18" y="490" font-size="10" fill="#848a96">Le faux negatif est declare volontairement : un tableau ou tout est detecte ne demontre qu'une installation reussie.</text>
+</svg></div>
+<figcaption>Figure 5 · Matrice de détection. La colonne latence est renseignée par la mesure, et la ligne 5 est le livrable technique du projet.</figcaption>
+</figure>
+
+<h3>Les deux latences, et pourquoi il faut les séparer</h3>
+<p>Entre l'attaque et la notification il y a deux attentes de nature différente, et les additionner masquerait la seule des deux qui soit intéressante.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Latence</th><th>Entre</th><th>Ce qu'elle dépend de</th><th>Ordre attendu</th></tr></thead>
+<tbody>
+<tr><td>Détection</td><td>Heure de l'attaque et horodatage de l'alerte dans l'indexeur</td><td>Collecte, décodage, règles. Pour une règle de corrélation, elle inclut forcément la fenêtre de temps.</td><td>Quelques secondes, sauf corrélation</td></tr>
+<tr><td>Notification</td><td>Alerte indexée et ligne écrite par le récepteur</td><td><strong>L'intervalle d'évaluation de la règle Grafana, c'est à dire notre propre réglage</strong></td><td>Borné par cet intervalle</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+<h4>Le point d'honnêteté qui vaut des points</h4>
+<p>La latence de notification ne mesure pas la performance de la chaîne, elle mesure une décision de configuration. Avec une évaluation toutes les dix secondes, la notification arrive en moins de dix secondes, et ce n'est pas une prouesse : c'est le chiffre que nous avons choisi.</p>
+<p style="margin-bottom:0">Le dire à voix haute pendant la soutenance produit un effet très supérieur à laisser croire que c'est une mesure de rapidité. Et cela amène naturellement le compromis à expliquer : une évaluation très fréquente alourdit l'indexeur et multiplie les notifications en rafale, une évaluation rare retarde la réaction. Le choix de dix secondes est un compromis, pas un optimum.</p>
+</div>
+
+<h3>La mesure de la règle de corrélation, qui demande une précaution</h3>
+<p>Pour la règle 100002, la latence de détection ne peut pas être inférieure à l'intervalle entre le premier et le cinquième échec. Si le script d'attaque étale ses cinq tentatives sur quarante secondes, l'alerte ne peut pas arriver avant la quarantième seconde, et ce n'est pas un défaut de la chaîne.</p>
+
+<pre># mesures/05_app_bruteforce.sh
+DEBUT=$(date +%s)
+echo "debut $DEBUT" >> resultats/05.log
+for i in 1 2 3 4 5; do
+  curl -s -X POST http://app-01:8000/login \
+       -d "user=amine&pass=faux$i" > /dev/null
+  sleep 8                      # 5 echecs en 40 s, dans la fenetre de 60 s
+done
+echo "fin $(date +%s)" >> resultats/05.log
+# la latence utile se compte depuis le 5e echec, pas depuis le 1er</pre>
+
+<p>La bonne grandeur à relever est donc <strong>le délai entre le cinquième échec et l'alerte</strong>. C'est elle qui mesure la chaîne. Annoncer cette distinction avant de montrer le chiffre évite la question embarrassante où l'on explique après coup pourquoi la détection a pris quarante secondes.</p>
+
+<h3>Une mesure de tenue, en ordre de grandeur</h3>
+<p>Une seule mesure de charge, pour savoir de quoi on parle. Un script injecte des lignes dans le journal applicatif à débit croissant, et on observe à partir de quel débit l'écart entre l'heure de la ligne et l'horodatage de l'alerte commence à croître au lieu de rester constant.</p>
+
+<div class="box note">
+<h4>Ce que ce chiffre vaut, et ce qu'il ne vaut pas</h4>
+<p style="margin-bottom:0">Il mesure un portable, pas une architecture, et il faut le dire. Son intérêt est ailleurs : il montre qu'au delà d'un certain débit une chaîne de détection prend du retard, et qu'un retard de détection est une forme de panne silencieuse. Un attaquant qui connaît cette propriété peut noyer la chaîne sous le bruit pour masquer l'événement qui compte. Mentionner cela en une phrase vaut mieux que trois courbes de performance.</p>
+</div>
+</section>
+
+<section id="plan">
+<span class="secno">SECTION 12</span>
+<h2>Organisation, répartition et planning</h2>
+<p>Deux personnes, dix jours ouvrés. La répartition suit la ligne naturelle du sujet : le parc et son durcissement d'un côté, la détection et la restitution de l'autre.</p>
+
+<figure>
+<div class="svgscroll"><svg viewBox="0 0 820 542" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+<rect width="820" height="542" fill="#fffdfa"/>
+<text x="18" y="24" font-size="11" font-weight="700" fill="#16181d">PLANNING &#183; 2 SEMAINES, 2 PERSONNES, 10 JOURS OUVRES</text>
+<rect x="330" y="36" width="235.0" height="20" fill="#f1efe9"/>
+<rect x="565.0" y="36" width="235.0" height="20" fill="#e9e5dd"/>
+<text x="448" y="50" text-anchor="middle" font-size="9.5" font-weight="700" fill="#4a4f5a">SEMAINE 1</text>
+<text x="682" y="50" text-anchor="middle" font-size="9.5" font-weight="700" fill="#4a4f5a">SEMAINE 2</text>
+<line x1="330" y1="72" x2="330" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="354" y="68" text-anchor="middle" font-size="9" fill="#848a96">J1</text>
+<line x1="377" y1="72" x2="377" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="400" y="68" text-anchor="middle" font-size="9" fill="#848a96">J2</text>
+<line x1="424" y1="72" x2="424" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="448" y="68" text-anchor="middle" font-size="9" fill="#848a96">J3</text>
+<line x1="471" y1="72" x2="471" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="494" y="68" text-anchor="middle" font-size="9" fill="#848a96">J4</text>
+<line x1="518" y1="72" x2="518" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="542" y="68" text-anchor="middle" font-size="9" fill="#848a96">J5</text>
+<line x1="565" y1="72" x2="565" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="588" y="68" text-anchor="middle" font-size="9" fill="#848a96">J6</text>
+<line x1="612" y1="72" x2="612" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="636" y="68" text-anchor="middle" font-size="9" fill="#848a96">J7</text>
+<line x1="659" y1="72" x2="659" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="682" y="68" text-anchor="middle" font-size="9" fill="#848a96">J8</text>
+<line x1="706" y1="72" x2="706" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="730" y="68" text-anchor="middle" font-size="9" fill="#848a96">J9</text>
+<line x1="753" y1="72" x2="753" y2="466" stroke="#ece7de" stroke-width="1"/>
+<text x="776" y="68" text-anchor="middle" font-size="9" fill="#848a96">J10</text>
+<line x1="800" y1="72" x2="800" y2="466" stroke="#ece7de" stroke-width="1"/>
+<line x1="565" y1="72" x2="565" y2="466" stroke="#b8b2a6" stroke-width="1.3"/>
+<text x="18" y="92" font-size="10" fill="#4a4f5a">Pile Wazuh debout, contrat d'interface gele</text>
+<rect x="333" y="78" width="41" height="18" rx="4" fill="#e9e5dd" stroke="#16181d" stroke-width="1.3"/>
+<text x="354" y="92" text-anchor="middle" font-size="9" font-weight="700" fill="#16181d">A+B</text>
+<text x="18" y="122" font-size="10" fill="#4a4f5a">Trois hotes Linux, agents enroles, canal TLS</text>
+<rect x="380" y="108" width="88" height="18" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+<text x="424" y="122" text-anchor="middle" font-size="9" font-weight="700" fill="#064e3b">A</text>
+<text x="18" y="152" font-size="10" fill="#4a4f5a">Journal applicatif maison, format fige</text>
+<rect x="380" y="138" width="41" height="18" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+<text x="400" y="152" text-anchor="middle" font-size="9" font-weight="700" fill="#064e3b">A</text>
+<text x="18" y="182" font-size="10" fill="#4a4f5a">Source OpenSearch dans Grafana, 1er tableau de bord</text>
+<rect x="380" y="168" width="88" height="18" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.3"/>
+<text x="424" y="182" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">B</text>
+<text x="18" y="212" font-size="10" fill="#4a4f5a">Scenarios 1 a 4 scriptes et horodates</text>
+<rect x="427" y="198" width="88" height="18" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.3"/>
+<text x="471" y="212" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">B</text>
+<text x="18" y="242" font-size="10" fill="#4a4f5a">Chaine complete de bout en bout, gel technique</text>
+<rect x="521" y="228" width="41" height="18" rx="4" fill="#e9e5dd" stroke="#16181d" stroke-width="1.3"/>
+<text x="542" y="242" text-anchor="middle" font-size="9" font-weight="700" fill="#16181d">A+B</text>
+<text x="18" y="272" font-size="10" fill="#4a4f5a">Controle d'integrite FIM, reglage de l'intervalle</text>
+<rect x="568" y="258" width="41" height="18" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+<text x="588" y="272" text-anchor="middle" font-size="9" font-weight="700" fill="#064e3b">A</text>
+<text x="18" y="302" font-size="10" fill="#4a4f5a">Decodeur maison, regles 100001 et 100002</text>
+<rect x="568" y="288" width="88" height="18" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.3"/>
+<text x="612" y="302" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">B</text>
+<text x="18" y="332" font-size="10" fill="#4a4f5a">Durcissement : mots de passe, TLS, ports fermes</text>
+<rect x="615" y="318" width="88" height="18" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+<text x="659" y="332" text-anchor="middle" font-size="9" font-weight="700" fill="#064e3b">A</text>
+<text x="18" y="362" font-size="10" fill="#4a4f5a">Regle d'alerte Grafana et recepteur</text>
+<rect x="615" y="348" width="88" height="18" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1.3"/>
+<text x="659" y="362" text-anchor="middle" font-size="9" font-weight="700" fill="#78350f">B</text>
+<text x="18" y="392" font-size="10" fill="#4a4f5a">Execution de la matrice, releve des latences</text>
+<rect x="709" y="378" width="41" height="18" rx="4" fill="#e9e5dd" stroke="#16181d" stroke-width="1.3"/>
+<text x="730" y="392" text-anchor="middle" font-size="9" font-weight="700" fill="#16181d">A+B</text>
+<text x="18" y="422" font-size="10" fill="#4a4f5a">Rapport technique et guide d'installation</text>
+<rect x="709" y="408" width="88" height="18" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.3"/>
+<text x="753" y="422" text-anchor="middle" font-size="9" font-weight="700" fill="#064e3b">A</text>
+<text x="18" y="452" font-size="10" fill="#4a4f5a">Repetition de soutenance, video de secours</text>
+<rect x="756" y="438" width="41" height="18" rx="4" fill="#e9e5dd" stroke="#16181d" stroke-width="1.3"/>
+<text x="776" y="452" text-anchor="middle" font-size="9" font-weight="700" fill="#16181d">A+B</text>
+<path d="M565 472 l7 11 l-7 11 l-7 -11 z" fill="#b45309"/>
+<text x="579" y="488" font-size="9.5" font-weight="700" fill="#b45309">Jalon 1 : une attaque scriptee produit une alerte visible dans Grafana</text>
+<path d="M800 502 l7 11 l-7 11 l-7 -11 z" fill="#15803d"/>
+<text x="786" y="518" text-anchor="end" font-size="9.5" font-weight="700" fill="#15803d">Jalon 2 : matrice remplie, soutenance repetee</text>
+<text x="18" y="532" font-size="10" fill="#848a96">A : parc surveille et durcissement. B : detection et restitution. Le format du journal applicatif est livre par A le jour 2, sinon B ne peut rien ecrire.</text>
+</svg></div>
+<figcaption>Figure 6 · Planning sur dix jours ouvrés, avec deux jalons et le gel technique du jour 5.</figcaption>
+</figure>
+
+<div class="two">
+<div class="card">
+<h5>Personne A · parc et durcissement</h5>
+<ul>
+<li>Les trois hôtes Linux et l'application maison, avec son journal</li>
+<li>L'enrôlement des agents, le canal chiffré, le contrôle d'intégrité</li>
+<li><strong>Livre le format exact du journal au jour 2</strong>, trois lignes réelles dans le dépôt</li>
+<li>Mots de passe par défaut, ports fermés, démonstrations de refus</li>
+<li>Rapport technique et guide d'installation</li>
+</ul>
+</div>
+<div class="card">
+<h5>Personne B · détection et restitution</h5>
+<ul>
+<li>Les cinq scripts d'attaque, chacun horodaté</li>
+<li>Le décodeur et les trois règles, mis au point avec <code>wazuh-logtest</code></li>
+<li>La source de données, les tableaux de bord, la règle d'alerte, le récepteur</li>
+<li>Le dépouillement de la matrice et des latences</li>
+<li>Le support de soutenance</li>
+</ul>
+</div>
+</div>
+
+<h3>Les deux jalons</h3>
+<div class="step"><div class="stepn">J5</div><div class="stept">Une attaque scriptée produit une alerte visible dans Grafana</div>
+<div class="stepd">N'importe lequel des quatre premiers scénarios suffit. La chaîne entière est alors prouvée de bout en bout, et tout le reste du projet consiste à l'enrichir et à la mesurer. À partir de ce point, <strong>gel technique</strong> : plus aucun hôte ajouté au parc, plus aucune fonctionnalité ajoutée à l'application. Si ce jalon n'est pas tenu au soir du jour 5, la décision est de descendre à deux hôtes, pas de prendre du retard sur la semaine 2.</div></div>
+<div class="step"><div class="stepn">J10</div><div class="stept">Matrice remplie, soutenance répétée</div>
+<div class="stepd">Les cinq scénarios ont tourné, les latences sont relevées, le décodeur et les règles sont dans le dépôt. La présentation a été répétée en entier, chronomètre en main, et la vidéo de secours est enregistrée hors ligne.</div></div>
+
+<div class="box warn">
+<h4>L'ordre des priorités si la semaine 2 déborde</h4>
+<p style="margin-bottom:0">Ce qui tombe en premier : la mesure de tenue en charge, puis le troisième hôte, puis la règle 100003. Ce qui ne tombe jamais : le décodeur et la règle de corrélation du scénario 5, et la matrice de détection. Ces deux là <strong>sont</strong> le projet. Un dossier sans mesure de charge reste excellent ; un dossier sans la ligne 5 de la matrice n'est qu'une installation réussie.</p>
+</div>
+</section>
+<section id="risques">
+<span class="secno">SECTION 13</span>
+<h2>Risques et parades</h2>
+
+<div class="tw">
+<table>
+<thead><tr><th>Risque</th><th>Symptôme</th><th>Parade</th><th>Quand vérifier</th></tr></thead>
+<tbody>
+<tr><td><code>vm.max_map_count</code> trop bas</td><td>L'indexeur démarre puis s'arrête, erreur dans ses journaux</td><td><code>sysctl -w vm.max_map_count=262144</code> sur l'hôte, et l'écrire dans le guide d'installation</td><td><strong>Jour 1</strong></td></tr>
+<tr><td>Certificats de la pile non générés</td><td>Le gestionnaire et l'indexeur ne se parlent pas, aucune alerte n'arrive</td><td>Lancer l'outil de génération de certificats du dépôt Wazuh <strong>avant</strong> le premier démarrage</td><td><strong>Jour 1</strong></td></tr>
+<tr><td>Agents en état <code>Never connected</code></td><td>Les hôtes apparaissent mais n'envoient rien</td><td>Enrôlement sur le port 1515 avant le démarrage de l'agent, et nom d'agent unique par hôte</td><td><strong>Jour 2</strong></td></tr>
+<tr><td><strong>Format du journal livré en retard</strong></td><td>B attend, et la partie la plus notée du projet n'avance pas</td><td>Trois lignes réelles dans le dépôt au jour 2, même si l'application est encore incomplète</td><td><strong>Jour 2</strong></td></tr>
+<tr><td>Contrôle d'intégrité silencieux</td><td>Le scénario 2 ne produit aucune alerte pendant la séance</td><td><code>realtime="yes"</code> sur les répertoires surveillés, et vérifier par une modification de test</td><td><strong>Semaine 1, J4</strong></td></tr>
+<tr><td>Décodeur qui ne reconnaît rien</td><td><code>wazuh-logtest</code> s'arrête à la phase 2 sans extraire de champ</td><td>Mettre au point sur une ligne copiée, pas en relançant l'attaque. Attention aux espaces exacts.</td><td><strong>Semaine 2, J1</strong></td></tr>
+<tr><td>Règle de corrélation jamais déclenchée</td><td>Cinq alertes de niveau 5, aucune de niveau 10</td><td>Vérifier que les cinq échecs tiennent dans <code>timeframe</code> et viennent de la même adresse source</td><td><strong>Semaine 2, J2</strong></td></tr>
+<tr><td>Grafana ne voit pas l'index</td><td>Source de données en erreur, ou aucune donnée</td><td>Nom d'index avec joker, champ temporel positionné sur <code>@timestamp</code>, certificat accepté</td><td><strong>Semaine 1, J3</strong></td></tr>
+<tr><td>Notifications en rafale</td><td>Le récepteur reçoit la même alerte en boucle</td><td>Régler la période de répétition de la règle d'alerte Grafana, et le documenter comme un compromis assumé</td><td><strong>Semaine 2, J3</strong></td></tr>
+<tr><td>Démonstration qui échoue en direct</td><td>Une attaque ne produit rien devant le jury</td><td>Vidéo de secours enregistrée au jour 9, et <code>wazuh-logtest</code> gardé ouvert comme repli immédiat</td><td><strong>Semaine 2, J4</strong></td></tr>
+<tr><td>Dérive du périmètre</td><td>Quatrième hôte, réponse active, tableaux de bord supplémentaires</td><td>Gel technique au soir du jour 5, décidé à l'avance</td><td><strong>En continu</strong></td></tr>
+<tr><td>Un des deux décroche</td><td>Une moitié du projet avance seule</td><td>Tout dans le dépôt le soir même, et chacun sait relancer la partie de l'autre</td><td><strong>En continu</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box key">
+<h4>Les trois vérifications du premier jour</h4>
+<p>Avant d'écrire un script d'attaque ou une règle, trois choses doivent marcher. Si l'une échoue, il n'y a aucun intérêt à construire par dessus.</p>
+<pre># 1. le reglage noyau, sinon l'indexeur ne demarrera jamais
+sudo sysctl -w vm.max_map_count=262144
+
+# 2. la pile monte et le gestionnaire parle a l'indexeur
+docker compose up -d
+docker compose logs wazuh-manager | grep -i "connected\|error"
+curl -k -u <user>:<mdp> https://wazuh-indexer:9200/_cat/indices   # depuis net-soc
+
+# 3. l'outil de mise au point des regles repond
+docker exec -it wazuh-manager /var/ossec/bin/wazuh-logtest
+# coller une ligne de /var/log/auth.log, verifier les phases 1, 2 et 3</pre>
+<p style="margin-bottom:0">Le point 3 est celui qu'on oublie, et c'est le plus rentable : il décide de la vitesse à laquelle la semaine 2 avancera. Un groupe qui découvre cet outil au jour 7 aura écrit deux règles ; un groupe qui le connaît au jour 1 en écrira dix et gardera les trois meilleures.</p>
+</div>
+
+<h3>Structure du dépôt</h3>
+<pre>surveillance-soc/
+├── README.md                      contrat d'interface, ecrit en premier
+├── GUIDE-INSTALLATION.md           depuis une machine vierge, sysctl inclus
+├── docker-compose.yml             pile + parc, deux reseaux
+├── pile/
+│   ├── certs/                     generes, non versionnes
+│   ├── manager/
+│   │   ├── ossec.conf
+│   │   ├── decoders/local_decoder.xml    <-- ecrit par nous
+│   │   └── rules/local_rules.xml         <-- ecrit par nous
+│   ├── indexer/                   config, mots de passe hors depot
+│   ├── dashboard/
+│   └── grafana/
+│       ├── provisioning/          source OpenSearch, tableaux de bord
+│       └── alerting/              la regle d'alerte, en fichier
+├── parc/
+│   ├── web-01/                    nginx + sshd + agent
+│   ├── app-01/                    application maison + agent
+│   ├── files-01/                  partage + agent
+│   └── attaquant/                 image des scripts d'attaque
+├── attaques/
+│   ├── 01_ssh_bruteforce.sh
+│   ├── 02_integrite_fichier.sh
+│   ├── 03_injection_sql.sh
+│   ├── 04_compte_sudo.sh
+│   ├── 05_app_bruteforce.sh       <-- le scenario non couvert par defaut
+│   └── resultats/                 sorties horodatees, versionnees
+├── recepteur/                     20 lignes de Python
+└── docs/
+    ├── journal-exemple.log        3 lignes reelles, livrees au jour 2
+    └── rapport/                   figures et matrice remplie</pre>
+
+<p>Deux fichiers de cette arborescence portent la note de réalisation : <code>local_decoder.xml</code> et <code>local_rules.xml</code>. Tout le reste est de la configuration et de l'assemblage, utiles et nécessaires, mais que n'importe quel groupe produira. Il est donc normal que le rapport et la soutenance leur consacrent une place disproportionnée par rapport à leur nombre de lignes.</p>
+
+<div class="box note">
+<h4>Correspondance avec la grille d'évaluation</h4>
+<div class="tw" style="margin-top:12px">
+<table>
+<thead><tr><th>Critère</th><th>Poids</th><th>Où il est servi dans ce dossier</th></tr></thead>
+<tbody>
+<tr><td>Compréhension du Cloud et problématique</td><td>10 %</td><td>Sections 1 et 2, dont les quatre problèmes des journaux et la limite conceptuelle des règles</td></tr>
+<tr><td>Architecture et choix technologiques</td><td>20 %</td><td>Sections 5 à 7 en trois vues normalisées, section 9 avec les choix écartés</td></tr>
+<tr><td>Réalisation technique</td><td>30 %</td><td>Section 8 : décodeur, règle atomique, règle de corrélation, règle de succès après échecs</td></tr>
+<tr><td>Sécurité et bonnes pratiques</td><td>10 %</td><td>Section 10, cinq mesures sur la chaîne elle même, avec la faille de l'agent arrêté énoncée</td></tr>
+<tr><td>Tests et validation</td><td>10 %</td><td>Section 11, matrice de cinq scénarios avec faux négatif déclaré et deux latences séparées</td></tr>
+<tr><td>Rapport et documentation</td><td>10 %</td><td>Dépôt structuré, guide d'installation testé sur machine vierge</td></tr>
+<tr><td>Soutenance et démonstration</td><td>10 %</td><td>Scénario 5 joué en direct, effacement du journal local, vidéo de secours</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<footer>Dossier construit sur le sujet 13 du document de propositions du Pr. Hamal, son cahier des charges commun et sa grille d'évaluation.</footer>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#navLinks a'));
+  if(!links.length) return;
+  var ids=links.map(function(a){return a.getAttribute('href').slice(1);});
+  var strip=document.getElementById('navLinks');
+  var prev=document.getElementById('navPrev'), next=document.getElementById('navNext');
+  var nav=document.querySelector('nav');
+  var curIdx=-1, lock=0, tops=[];
+  function navH(){ return nav?nav.offsetHeight:48; }
+  function measure(){ tops=ids.map(function(id){ var el=document.getElementById(id);
+    return el?el.getBoundingClientRect().top+window.pageYOffset:0; }); }
+  function centerTab(i){ var a=links[i]; if(!a) return;
+    var t=a.offsetLeft-(strip.clientWidth-a.clientWidth)/2, m=strip.scrollWidth-strip.clientWidth;
+    strip.scrollLeft=Math.max(0,Math.min(m,t)); }
+  function setActive(i,center){ if(i<0||i>=links.length||i===curIdx) return;
+    curIdx=i; links.forEach(function(a,j){ a.classList.toggle('on',j===i); });
+    prev.disabled=i===0; next.disabled=i===links.length-1;
+    if(center!==false) centerTab(i); }
+  function goTo(i){ if(i<0||i>=ids.length) return; measure(); lock=Date.now()+700;
+    window.scrollTo({top:Math.max(0,tops[i]-navH()-8),behavior:'smooth'}); setActive(i); }
+  window.navStep=function(d){ goTo(curIdx+d); };
+  links.forEach(function(a,i){ a.addEventListener('click',function(e){ e.preventDefault(); goTo(i); }); });
+  var tick=false;
+  function onScroll(){ if(tick||Date.now()<lock) return; tick=true;
+    requestAnimationFrame(function(){ tick=false;
+      var y=window.pageYOffset+navH()+40, best=0;
+      for(var k=0;k<tops.length;k++){ if(tops[k]<=y) best=k; }
+      setActive(best); }); }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',function(){ measure(); onScroll(); });
+  measure(); setActive(0,false); onScroll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!--
+  Regles locales du projet. Tout ce qui est ici a ete ecrit pour ce sujet :
+  le jeu livre avec Wazuh ne couvre AUCUN de ces cas, parce qu'ils dependent de
+  la logique metier d'une application qu'il ne connait pas.
+
+  Plage d'identifiants 100100 a 100199 : reservee aux regles locales.
+
+  Scenarios 1 a 4 : deliberement absents de ce fichier. Ils sont couverts par le
+  jeu livre (sshd, sudo, syscheck), et c'est le point du rapport : montrer ce
+  qui marche sans nous, puis montrer ce qui ne marche pas sans nous.
+-->
+
+<group name="app_metier,dossiers,">
+
+  <!-- 1. Regle d'ancrage. Niveau 0 : ne produit aucune alerte, sert de socle. -->
+  <rule id="100100" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="app">^dossiers$</field>
+    <description>Application dossiers : evenement applicatif (ancrage).</description>
+  </rule>
+
+  <!-- 2. Regle de base. Un refus isole est informatif, pas une alerte.
+       Niveau 3 : visible dans la console, ne reveille personne. -->
+  <rule id="100110" level="3">
+    <if_sid>100100</if_sid>
+    <field name="status">^403$</field>
+    <description>Dossiers : acces refuse pour $(user) sur $(dossier_id).</description>
+    <group>access_denied,</group>
+  </rule>
+
+  <!-- 3. Regle de correlation. C'est elle qui detecte l'enumeration.
+
+       Le seuil est un arbitrage, pas une valeur trouvee au hasard :
+       un utilisateur legitime qui se trompe de dossier le fait 2 ou 3 fois par
+       heure. Le script d'attaque produit 40 refus en 12 secondes. Entre les
+       deux il y a deux ordres de grandeur, donc 25 refus en 30 secondes se
+       situe tres au-dessus du bruit legitime et tres en dessous de l'attaque.
+
+       same_field sur l'utilisateur ET la source : sans ca, 25 refus repartis
+       sur 25 comptes differents declencheraient aussi, ce qui est un autre
+       phenomene et merite une autre regle. -->
+  <rule id="100120" level="10" frequency="25" timeframe="30">
+    <if_matched_sid>100110</if_matched_sid>
+    <same_field>data.user</same_field>
+    <same_field>data.src_ip</same_field>
+    <description>Dossiers : enumeration probable, $(user) depuis $(src_ip).</description>
+    <mitre>
+      <id>T1087</id>
+    </mitre>
+    <group>attack,enumeration,</group>
+  </rule>
+
+  <!-- 4. Le meme traitement, mais par le chemin texte du mode degrade.
+       Preuve que notre decodeur fonctionne de bout en bout. -->
+  <rule id="100150" level="0">
+    <decoded_as>dossiers</decoded_as>
+    <description>Application dossiers, mode degrade : evenement (ancrage).</description>
+  </rule>
+
+  <rule id="100160" level="3">
+    <if_sid>100150</if_sid>
+    <field name="status">^403$</field>
+    <description>Dossiers (mode degrade) : acces refuse pour $(user).</description>
+    <group>access_denied,</group>
+  </rule>
+
+  <rule id="100170" level="10" frequency="25" timeframe="30">
+    <if_matched_sid>100160</if_matched_sid>
+    <same_srcip />
+    <description>Dossiers (mode degrade) : enumeration probable depuis $(srcip).</description>
+    <group>attack,enumeration,</group>
+  </rule>
+
+</group>
+
+<!--
+  Reglage de confort pour la demonstration.
+  La regle livree 5712 (force brute SSH) exige 8 echecs en 120 secondes.
+  Le script 01 en produit 20 en 30 secondes, donc elle se declenche telle quelle
+  et on ne la touche pas. Elle est listee ici uniquement pour que le lecteur du
+  depot sache qu'on l'a verifiee et pas surchargee.
+
+  <rule id="5712" level="10" frequency="8" timeframe="120" overwrite="yes"> ... </rule>
+-->

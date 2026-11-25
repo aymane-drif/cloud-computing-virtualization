@@ -1,0 +1,192 @@
+# Sujet 13 - Surveillance et detection d'incidents
+# Trois reseaux, et c'est la decision d'architecture du projet :
+#   net-parc  : les hotes surveilles et l'attaquant
+#   net-soc   : internal, l'indexeur et les interfaces ; le parc n'y a aucune route
+#   net-admin : l'acces navigateur depuis le poste, sans exposer l'indexeur
+# Le gestionnaire est le seul conteneur a toucher net-parc et net-soc.
+
+name: soc-sujet13
+
+x-agent-env: &agent-env
+  WAZUH_MANAGER: wazuh-manager
+  WAZUH_REGISTRATION_SERVER: wazuh-manager
+  WAZUH_REGISTRATION_PASSWORD: ${AGENT_ENROLLMENT_PASSWORD}
+
+services:
+
+  # ---------------------------------------------------------------- certificats
+  generator:
+    image: docker.io/wazuh/wazuh-certs-generator:0.0.2
+    hostname: wazuh-certs-generator
+    # profiles : ce service n'est PAS demarre par 'up'. Il est lance une fois
+    # par scripts/preparer.sh. Raison : podman-compose ne gere pas
+    # 'service_completed_successfully' (issue 575, ouverte depuis 2022), donc
+    # un depends_on sur ce generateur rendrait le fichier incompatible podman.
+    profiles: ["setup"]
+    volumes:
+      - ./config/wazuh_indexer_ssl_certs/:/certificates/
+      - ./config/certs/certs.yml:/config/certs.yml:ro
+    environment:
+      - HTTP_PROXY=
+    networks: [net-soc]
+
+  # ---------------------------------------------------------------- pile SOC
+  wazuh-indexer:
+    image: docker.io/wazuh/wazuh-indexer:${WAZUH_VERSION}
+    hostname: wazuh-indexer
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      # bootstrap.memory_lock reste a false : en podman rootless, le verrouillage
+      # memoire est refuse (setrlimit RLIMIT_MEMLOCK: Operation not permitted) et
+      # l'indexeur ne demarre pas du tout. Sur un poste de developpement le tas
+      # JVM peut etre swappe, ce qui est sans consequence ici. En production ce
+      # reglage serait a true, avec les ulimits qui vont avec.
+      - bootstrap.memory_lock=false
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+    volumes:
+      - indexer-data:/var/lib/wazuh-indexer
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/wazuh-indexer/certs/root-ca.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh-indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh-indexer.key:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh-indexer.pem:/usr/share/wazuh-indexer/certs/wazuh-indexer.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem:ro
+      - ./config/wazuh/indexer/opensearch.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+    networks: [net-soc]      # jamais sur net-parc, jamais sur net-admin
+    restart: unless-stopped
+
+  wazuh-manager:
+    image: docker.io/wazuh/wazuh-manager:${WAZUH_VERSION}
+    hostname: wazuh-manager
+    depends_on: [wazuh-indexer]
+    environment:
+      - INDEXER_URL=https://wazuh-indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${INDEXER_PASSWORD}
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+      - SSL_KEY=/etc/ssl/filebeat.key
+    ulimits:
+      nofile: { soft: 65536, hard: 65536 }
+    volumes:
+      - manager-etc:/var/ossec/etc
+      - manager-logs:/var/ossec/logs
+      - manager-queue:/var/ossec/queue
+      - ./config/wazuh_indexer_ssl_certs/root-ca-manager.pem:/etc/ssl/root-ca.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh-manager.pem:/etc/ssl/filebeat.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh-manager-key.pem:/etc/ssl/filebeat.key:ro
+      # Nos regles et notre decodeur : c'est tout le travail du sujet 13
+      - ./config/wazuh/manager/rules/local_rules.xml:/var/ossec/etc/rules/local_rules.xml
+      - ./config/wazuh/manager/decoders/local_decoder.xml:/var/ossec/etc/decoders/local_decoder.xml
+      - ./config/wazuh/manager/authd.pass:/var/ossec/etc/authd.pass
+    ports:
+      - "1514:1514"
+      - "1515:1515"
+      - "55000:55000"
+    networks: [net-parc, net-soc]   # le seul pont entre les deux
+    restart: unless-stopped
+
+  wazuh-dashboard:
+    image: docker.io/wazuh/wazuh-dashboard:${WAZUH_VERSION}
+    hostname: wazuh-dashboard
+    depends_on: [wazuh-indexer]
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${INDEXER_PASSWORD}
+      - WAZUH_API_URL=https://wazuh-manager
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=kibanaserver
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - ./config/wazuh_indexer_ssl_certs/wazuh-dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/wazuh-dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem:ro
+      - ./config/wazuh_indexer_ssl_certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem:ro
+    ports:
+      - "8443:5601"
+    networks: [net-soc, net-admin]
+    restart: unless-stopped
+
+  grafana:
+    image: docker.io/grafana/grafana:11.3.0
+    hostname: grafana
+    depends_on: [wazuh-indexer]
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-opensearch-datasource
+      - GF_UNIFIED_ALERTING_ENABLED=true
+      - GF_USERS_DEFAULT_THEME=light
+      - INDEXER_PASSWORD=${INDEXER_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    networks: [net-soc, net-admin]
+    restart: unless-stopped
+
+  recepteur:
+    build: ./recepteur
+    hostname: recepteur
+    networks: [net-soc]
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------- le parc
+  hote-a:
+    build: ./parc
+    hostname: hote-a
+    environment:
+      <<: *agent-env
+      WAZUH_AGENT_NAME: hote-a
+    cap_add: [SYS_PTRACE]
+    networks: [net-parc]
+    restart: unless-stopped
+
+  hote-b:
+    build: ./parc
+    hostname: hote-b
+    environment:
+      <<: *agent-env
+      WAZUH_AGENT_NAME: hote-b
+    cap_add: [SYS_PTRACE]
+    networks: [net-parc]
+    restart: unless-stopped
+
+  hote-c:
+    build: ./parc
+    hostname: hote-c
+    environment:
+      <<: *agent-env
+      WAZUH_AGENT_NAME: hote-c
+      APP_METIER: "oui"          # hote-c porte l'application du scenario 5
+    cap_add: [SYS_PTRACE]
+    networks: [net-parc]
+    restart: unless-stopped
+
+  attaquant:
+    build: ./attaquant
+    hostname: attaquant
+    volumes:
+      - ./attaques:/attaques:ro
+      - ./mesures:/mesures
+    networks: [net-parc]
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
+
+networks:
+  net-parc:
+    driver: bridge
+  net-soc:
+    driver: bridge
+    internal: true        # la preuve 3 du dossier tient a cette ligne
+  net-admin:
+    driver: bridge
+
+volumes:
+  indexer-data:
+  manager-etc:
+  manager-logs:
+  manager-queue:
+  grafana-data:

@@ -1,0 +1,8 @@
+.env
+config/wazuh_indexer_ssl_certs/
+captures/video/
+mesures/*.csv
+mesures/starts.log
+!mesures/.gitkeep
+__pycache__/
+*.pyc

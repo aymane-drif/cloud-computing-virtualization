@@ -1,0 +1,24 @@
+[moteur] podman compose
+== 1. Fichier .env ==
+   .env cree depuis .env.example. Changez les mots de passe avant de continuer.
+== 2. vm.max_map_count ==
+   actuel : 0, insuffisant. L'indexeur refusera de demarrer.
+
+  Linux natif :
+    sudo sysctl -w vm.max_map_count=262144
+    echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf
+
+  Podman sous Windows ou macOS (la VM podman machine) :
+    podman machine ssh
+    sudo sysctl -w vm.max_map_count=262144
+    sudo sh -c "echo 'vm.max_map_count=262144' >> /etc/sysctl.conf"
+    exit
+
+  Docker Desktop sous Windows (WSL2) :
+    wsl -d docker-desktop sysctl -w vm.max_map_count=262144
+  ou, de maniere persistante, dans C:\Users\<vous>\.wslconfig :
+    [wsl2]
+    kernelCommandLine = sysctl.vm.max_map_count=262144
+  puis : wsl --shutdown
+
+   Sous Windows, la valeur lue ici est celle de la VM, pas celle de Windows.
